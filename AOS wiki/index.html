@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sample Hero — Allure of the Supernal Codex</title>
+<meta name="description" content="Sample hero page for the Allure of the Supernal design codex. Placeholder content for visual review, not canonical game design.">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="../pinefig%20logo.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/design-system.css">
+</head>
+<body>
+<a class="skip" href="#overview">Skip to hero</a>
+
+<header class="nav">
+  <a class="brand" href="index.html">
+    <img src="../pinefig%20logo.png" alt="">
+    <span>
+      <span class="name">Allure of the Supernal</span>
+      <span class="sub">Design codex</span>
+    </span>
+  </a>
+  <nav class="nav-links" aria-label="Codex">
+    <a href="#overview" aria-current="page">Hero</a>
+    <a href="#abilities">Abilities</a>
+    <span class="soon" title="Held until this hero page is approved">Items</span>
+    <span class="soon" title="Held until this hero page is approved">Maps</span>
+    <span class="soon" title="Held until this hero page is approved">Systems</span>
+  </nav>
+  <form class="search" role="search" onsubmit="return false">
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="1.6"/><path d="M16 16.5L20 20.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+    <label class="sr-only" for="codex-search">Search this sample hero</label>
+    <input id="codex-search" data-search type="search" placeholder="Search this sample hero" autocomplete="off">
+    <div class="search-results" data-results></div>
+  </form>
+</header>
+
+<main>
+  <section class="hero wrap" id="overview">
+    <div class="kicker" data-kicker></div>
+    <div class="title-row">
+      <div class="tier-mark" data-tier></div>
+      <div class="title-copy">
+        <h1 data-name>Sample Hero</h1>
+        <p class="epithet" data-epithet></p>
+      </div>
+    </div>
+    <div class="profile-row">
+      <div class="portrait-wash" data-wash aria-hidden="true"></div>
+      <figure class="portrait" data-portrait></figure>
+      <div class="profile-side">
+        <div class="stat-sheet" data-snapshot></div>
+        <div class="movement" data-movement></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section wrap" id="abilities">
+    <div class="section-head">
+      <h2>Abilities</h2>
+      <p>Four abilities. Each is active or passive. Press 1–4.</p>
+    </div>
+    <div class="filters" data-filters>
+      <div class="filter-set" data-filter-group="kind">
+        <button type="button" data-filter="all" aria-pressed="true">All</button>
+        <button type="button" data-filter="active" aria-pressed="false">Active</button>
+        <button type="button" data-filter="passive" aria-pressed="false">Passive</button>
+      </div>
+      <div class="filter-set" data-filter-group="role">
+        <button type="button" data-filter="all" aria-pressed="true">All</button>
+        <button type="button" data-filter="damage" aria-pressed="false">Damage</button>
+        <button type="button" data-filter="movement" aria-pressed="false">Movement</button>
+        <button type="button" data-filter="control" aria-pressed="false">Control</button>
+      </div>
+    </div>
+    <div class="ability-dock" data-dock role="tablist" aria-label="Sample abilities"></div>
+    <article class="ability-card" data-card></article>
+  </section>
+
+  <section class="dossier wrap">
+    <article class="panel" id="lore" data-lore></article>
+    <article class="panel" id="stats" data-stats></article>
+  </section>
+
+  <section class="wrap">
+    <div class="section-head">
+      <h2>Linked entries</h2>
+      <p>Cross-links only. These records are not separate pages yet.</p>
+    </div>
+    <div class="related" data-related></div>
+  </section>
+</main>
+
+<footer class="site">
+  <span>Sample dossier for visual review. Not canonical Allure of the Supernal design.</span>
+  <span>Pine Fig · private codex</span>
+</footer>
+
+<script src="data/sample-hero.js"></script>
+<script src="js/codex.js"></script>
+</body>
+</html>

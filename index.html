@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pine Fig — Independent games from a one-person studio</title>
+<meta name="description" content="Pine Fig is a solo game studio building Poker Pine, Word Puzzle, and Allure of the Supernal.">
+<link rel="icon" href="pinefig%20logo.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,340;9..144,440;9..144,560&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --pine: #1c3b2e;
+    --pine-deep: #12261d;
+    --plum: #4b2545;
+    --flesh: #e8927c;
+    --paper: #f3ede2;
+    --ink: #201a12;
+    --sage: #a9bfa0;
+    --line-on-dark: rgba(243,237,226,0.16);
+    --line-on-light: rgba(32,26,18,0.12);
+  }
+
+  *{ box-sizing: border-box; }
+  html{ scroll-behavior: smooth; }
+  body{
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Work Sans', sans-serif;
+    font-size: 17px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3, .wordmark{
+    font-family: 'Fraunces', serif;
+    font-weight: 560;
+    letter-spacing: -0.01em;
+    margin: 0;
+  }
+  a{ color: inherit; }
+  .wrap{
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 0 32px;
+  }
+  section{ padding: 96px 0; }
+  @media (max-width: 720px){
+    section{ padding: 64px 0; }
+    .wrap{ padding: 0 22px; }
+  }
+
+  /* ---------- header ---------- */
+  header{
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: rgba(243,237,226,0.88);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--line-on-light);
+  }
+  header .wrap{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 76px;
+  }
+  .brand{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Fraunces', serif;
+    font-weight: 560;
+    font-size: 21px;
+    text-decoration: none;
+    color: var(--ink);
+  }
+  .brand img{
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    border-radius: 7px;
+    object-fit: cover;
+    display: block;
+  }
+  nav{ display: flex; gap: 30px; }
+  nav a{
+    text-decoration: none;
+    font-size: 15px;
+    color: var(--ink);
+    opacity: 0.75;
+    transition: opacity 0.15s ease;
+  }
+  nav a:hover{ opacity: 1; }
+  @media (max-width: 560px){
+    nav{ gap: 18px; }
+    nav a{ font-size: 13.5px; }
+  }
+
+  /* ---------- hero ---------- */
+  .hero{
+    background: var(--pine);
+    color: var(--paper);
+    padding: 110px 0 120px;
+    overflow: hidden;
+    position: relative;
+  }
+  .hero .wrap{
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 48px;
+    align-items: center;
+  }
+  @media (max-width: 860px){
+    .hero .wrap{ grid-template-columns: 1fr; }
+    .hero{ padding: 76px 0 88px; }
+  }
+  .hero h1{
+    font-size: clamp(44px, 6.4vw, 74px);
+    line-height: 0.98;
+    color: var(--paper);
+  }
+  .hero .lede{
+    margin-top: 26px;
+    max-width: 46ch;
+    font-size: 19px;
+    color: var(--sage);
+  }
+  .hero .lede2{
+    margin-top: 14px;
+    max-width: 46ch;
+    font-size: 16px;
+    color: rgba(243,237,226,0.72);
+  }
+  .hero-mark{
+    justify-self: center;
+    width: min(100%, 360px);
+  }
+  .hero-mark img{
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 18px;
+  }
+
+  /* ---------- games ---------- */
+  .games-intro{
+    max-width: 56ch;
+  }
+  .games-intro h2{ font-size: 34px; }
+  .games-intro p{
+    margin-top: 16px;
+    color: rgba(32,26,18,0.72);
+    font-size: 17px;
+  }
+
+  .game-row{
+    display: grid;
+    grid-template-columns: 0.85fr 1.15fr;
+    gap: 56px;
+    align-items: center;
+    padding: 56px 0;
+    border-top: 1px solid var(--line-on-light);
+  }
+  .game-row:last-child{ border-bottom: 1px solid var(--line-on-light); }
+  .game-row.reverse{ grid-template-columns: 1.15fr 0.85fr; }
+  .game-row.reverse .game-art{ order: 2; }
+  .game-row.reverse .game-copy{ order: 1; }
+  .game-row.poker-row{
+    grid-template-columns: 0.85fr 1.15fr 0.55fr;
+  }
+  .game-suits img{
+    width: 100%;
+    max-width: 220px;
+    height: auto;
+    display: block;
+    mix-blend-mode: multiply;
+  }
+  @media (max-width: 780px){
+    .game-row, .game-row.reverse, .game-row.poker-row{
+      grid-template-columns: 1fr;
+      gap: 28px;
+    }
+    .game-row.reverse .game-art{ order: 1; }
+    .game-row.reverse .game-copy{ order: 2; }
+    .game-suits{
+      justify-self: center;
+    }
+  }
+
+  .game-art{
+    aspect-ratio: 4 / 3;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+    overflow: hidden;
+  }
+  .game-art svg{ width: 100%; height: 100%; }
+  .game-art img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .game-art.photo{ padding: 0; }
+  .game-art.mascot{
+    overflow: visible;
+    background: transparent;
+  }
+  .game-art.mascot img{
+    object-fit: contain;
+  }
+  .poker-row .game-art.mascot img{
+    transform: scale(1.5);
+    transform-origin: center center;
+  }
+  .game-art.mascot.robot{
+    padding: 0;
+    overflow: visible;
+    background: transparent;
+    aspect-ratio: auto;
+  }
+  .game-art.mascot.robot img{
+    width: 75%;
+    height: auto;
+    object-fit: contain;
+    transform: none;
+  }
+
+  .status{
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 13.5px;
+    color: rgba(32,26,18,0.65);
+    margin-bottom: 14px;
+  }
+  .status .dot{
+    width: 7px; height: 7px; border-radius: 50%;
+  }
+  .game-copy h3{ font-size: 28px; }
+  .game-copy .hook{
+    margin-top: 10px;
+    font-size: 17px;
+    color: rgba(32,26,18,0.66);
+  }
+  .game-copy p.desc{
+    margin-top: 14px;
+    font-size: 15.5px;
+    color: rgba(32,26,18,0.62);
+    max-width: 48ch;
+  }
+  .store-links{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-top: 22px;
+  }
+  .store-links a{
+    display: block;
+    line-height: 0;
+  }
+  .store-links img{
+    height: 44px;
+    width: auto;
+    display: block;
+  }
+  .game-copy .legal-link{
+    margin-top: 16px;
+    font-size: 14px;
+  }
+  .game-copy .legal-link a{
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  /* ---------- about ---------- */
+  .about{
+    background: var(--plum);
+    color: var(--paper);
+  }
+  .about .wrap{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 56px;
+    align-items: start;
+  }
+  @media (max-width: 780px){
+    .about .wrap{ grid-template-columns: 1fr; }
+  }
+  .about h2{
+    font-size: 32px;
+    color: var(--paper);
+  }
+  .about p{
+    margin-top: 18px;
+    font-size: 16.5px;
+    color: rgba(243,237,226,0.82);
+    max-width: 52ch;
+  }
+  .about .quote{
+    font-family: 'Fraunces', serif;
+    font-weight: 440;
+    font-size: 25px;
+    line-height: 1.4;
+    color: var(--flesh);
+    font-style: italic;
+    max-width: 30ch;
+  }
+
+  /* ---------- contact / footer ---------- */
+  .contact{
+    text-align: center;
+  }
+  .contact h2{ font-size: 32px; }
+  .contact p{
+    margin-top: 14px;
+    color: rgba(32,26,18,0.65);
+  }
+  .contact .email{
+    display: inline-block;
+    margin-top: 26px;
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    text-decoration: none;
+    border-bottom: 2px solid var(--flesh);
+    padding-bottom: 3px;
+  }
+
+  footer{
+    background: var(--pine-deep);
+    color: rgba(243,237,226,0.55);
+    font-size: 14px;
+    padding: 28px 0;
+  }
+  footer .wrap{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px 28px;
+  }
+  footer .mark{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  footer .mark img{
+    width: 22px;
+    height: 22px;
+    border-radius: 4px;
+    object-fit: cover;
+  }
+  footer .links{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 48px;
+    justify-content: center;
+    flex: 1 1 320px;
+  }
+  footer .col{
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  footer .col strong{
+    color: rgba(243,237,226,0.88);
+    font-weight: 600;
+    font-size: 12.5px;
+    letter-spacing: 0.02em;
+  }
+  footer a{ color: inherit; text-decoration: none; }
+  footer a:hover{ color: var(--paper); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <a class="brand" href="#top">
+      <img src="pinefig%20logo.png" alt="Pine Fig logo">
+      Pine Fig
+    </a>
+    <nav>
+      <a href="#games">Games</a>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero" id="top">
+  <div class="wrap">
+    <div>
+      <h1>Games grown&nbsp;one at a&nbsp;time.</h1>
+      <p class="lede">Pine Fig is a one-person game studio. Every game is designed, built, and shipped by the same hands, from the first prototype to the last patch.</p>
+      <p class="lede2">Three games, three very different tables: a card room, a puzzle grid, and a battlefield under the stars.</p>
+    </div>
+    <div class="hero-mark">
+      <img src="pinefig%20logo.png" alt="Pine Fig: a fig split with a pine cone">
+    </div>
+  </div>
+</section>
+
+<section id="games">
+  <div class="wrap">
+    <div class="games-intro">
+      <h2>What's on the table</h2>
+      <p>Each game starts from a familiar shape — a card game, a word puzzle, a strategy board — and gets pushed until it becomes something else.</p>
+    </div>
+
+    <div class="game-row poker-row">
+      <div class="game-art mascot">
+        <img src="poker%20squirrel.png" alt="Poker Pine mascot: a squirrel in sunglasses holding poker chips">
+      </div>
+      <div class="game-copy">
+        <div class="status"><span class="dot" style="background:#4b8b6b;"></span>In development</div>
+        <h3>Poker Pine</h3>
+        <p class="hook">Poker game, where you can enjoy the thrill of the tables on both mobile and desktop!</p>
+        <p class="desc">Experience high-stakes action, compete with players worldwide, and sharpen your skills in a user-friendly environment. Join us and elevate your poker experience today!</p>
+        <div class="store-links">
+          <a href="https://play.google.com/store/apps/details?id=com.PineFig.PokerPine" target="_blank" rel="noopener noreferrer">
+            <img src="google-play.png" alt="Get it on Google Play">
+          </a>
+          <a href="https://apps.apple.com/search?term=Poker%20Pine" target="_blank" rel="noopener noreferrer">
+            <img src="app-store.png" alt="Download on the App Store">
+          </a>
+        </div>
+        <p class="legal-link"><a href="poker-pine-privacy.html">Privacy Policy</a> · <a href="poker-pine-delete-account.html">How to delete your Poker Pine profile</a></p>
+      </div>
+      <div class="game-suits">
+        <img src="playing-cards-symbols-vector.jpg" alt="Playing card suits: hearts, spades, clubs, and diamonds">
+      </div>
+    </div>
+
+    <div class="game-row reverse">
+      <div class="game-art mascot robot">
+        <img src="robot_mascot.png" alt="Word Puzzle Tetromino mascot: a robot holding tetromino blocks">
+      </div>
+      <div class="game-copy">
+        <div class="status"><span class="dot" style="background:#4b8b6b;"></span>In development</div>
+        <h3>Word Puzzle Tetromino</h3>
+        <p class="hook">Every answer you find becomes a piece you have to place.</p>
+        <p class="desc">Solve a clue and its answer turns into a tetromino block that has to fit into the grid before you can move on. Knowing the word is only half the puzzle — fitting it in is the rest.</p>
+        <p class="legal-link"><a href="word-puzzle-tetromino-privacy.html">Privacy Policy</a> · <a href="word-puzzle-tetromino-delete-account.html">How to delete your Word Puzzle Tetromino profile</a></p>
+      </div>
+    </div>
+
+    <div class="game-row">
+      <div class="game-art photo">
+        <img src="allure_of_the_supernal_icon.jpg" alt="Allure of the Supernal: a figure standing in a radiant cosmic mandala">
+      </div>
+      <div class="game-copy">
+        <div class="status"><span class="dot" style="background:#c98a6b;"></span>Coming soon</div>
+        <h3>Allure of the Supernal</h3>
+        <p class="hook">A chess-like battlefield where every unit has a stat sheet and a reason to fight.</p>
+        <p class="desc">Turn-based tactics on a board that rewards positioning as much as power. Units carry their own stats and special abilities, so no two engagements play out the same way.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="about" id="about">
+  <div class="wrap">
+    <div>
+      <h2>One developer, three worlds.</h2>
+      <p>Pine Fig is run by a single developer who handles design, code, and art for every release. That means smaller games, released on a slower schedule — and a direct line between the person playing and the person who built it.</p>
+    </div>
+    <p class="quote">"Small enough to change my mind. Small enough to finish what I start."</p>
+  </div>
+</section>
+
+<section class="contact" id="contact">
+  <div class="wrap">
+    <h2>Get in touch</h2>
+    <p>Questions, feedback, or press requests — all welcome.</p>
+    <a class="email" href="mailto:contact@pinefig.com">contact@pinefig.com</a>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span class="mark"><img src="pinefig%20logo.png" alt="">© 2026 Pine Fig</span>
+    <nav class="links">
+      <div class="col">
+        <strong>Poker Pine</strong>
+        <a href="poker-pine-privacy.html">Privacy Policy</a>
+        <a href="poker-pine-delete-account.html">Delete profile</a>
+      </div>
+      <div class="col">
+        <strong>Word Puzzle Tetromino</strong>
+        <a href="word-puzzle-tetromino-privacy.html">Privacy Policy</a>
+        <a href="word-puzzle-tetromino-delete-account.html">Delete profile</a>
+      </div>
+    </nav>
+    <span>Sofia, Bulgaria</span>
+  </div>
+</footer>
+
+</body>
+</html>

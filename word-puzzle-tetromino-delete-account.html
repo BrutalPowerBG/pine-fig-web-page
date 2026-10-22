@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Delete your Word Puzzle Tetromino profile — Pine Fig (PineFig)</title>
+<meta name="description" content="How to delete your Word Puzzle Tetromino profile. Steps, what data is deleted, and how to request deletion from Pine Fig (PineFig).">
+<link rel="icon" href="pinefig%20logo.png" type="image/png">
+<link rel="canonical" href="https://pinefig.com/word-puzzle-tetromino-delete-account.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,340;9..144,440;9..144,560&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --pine: #1c3b2e;
+    --pine-deep: #12261d;
+    --plum: #4b2545;
+    --flesh: #e8927c;
+    --paper: #f3ede2;
+    --ink: #201a12;
+    --sage: #a9bfa0;
+    --line-on-light: rgba(32,26,18,0.12);
+  }
+  *{ box-sizing: border-box; }
+  body{
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Work Sans', sans-serif;
+    font-size: 17px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3{
+    font-family: 'Fraunces', serif;
+    font-weight: 560;
+    letter-spacing: -0.01em;
+    margin: 0;
+  }
+  a{ color: inherit; }
+  .wrap{
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 32px;
+  }
+  @media (max-width: 720px){
+    .wrap{ padding: 0 22px; }
+  }
+
+  header{
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: rgba(243,237,226,0.88);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--line-on-light);
+  }
+  header .wrap{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 76px;
+  }
+  .brand{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Fraunces', serif;
+    font-weight: 560;
+    font-size: 21px;
+    text-decoration: none;
+  }
+  .brand img{
+    width: 36px;
+    height: 36px;
+    border-radius: 7px;
+    object-fit: cover;
+    display: block;
+  }
+  nav{ display: flex; gap: 22px; }
+  nav a{
+    text-decoration: none;
+    font-size: 15px;
+    opacity: 0.75;
+  }
+  nav a:hover{ opacity: 1; }
+
+  .page{
+    padding: 64px 0 96px;
+  }
+  .kicker{
+    font-size: 13.5px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: rgba(32,26,18,0.55);
+    margin-bottom: 14px;
+  }
+  h1{
+    font-size: clamp(32px, 5vw, 46px);
+    line-height: 1.1;
+  }
+  .lede{
+    margin-top: 18px;
+    font-size: 18px;
+    color: rgba(32,26,18,0.72);
+  }
+
+  .steps{
+    list-style: none;
+    margin: 36px 0 0;
+    padding: 28px 28px 28px 32px;
+    background: #fff;
+    border: 1px solid var(--line-on-light);
+    border-radius: 8px;
+    counter-reset: step;
+  }
+  .steps li{
+    position: relative;
+    padding: 14px 0 14px 52px;
+    border-top: 1px solid var(--line-on-light);
+    font-size: 18px;
+    font-weight: 500;
+  }
+  .steps li:first-child{ border-top: none; padding-top: 0; }
+  .steps li:last-child{ padding-bottom: 0; }
+  .steps li::before{
+    counter-increment: step;
+    content: counter(step);
+    position: absolute;
+    left: 0;
+    top: 14px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--pine);
+    color: var(--paper);
+    font-size: 15px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .steps li:first-child::before{ top: 0; }
+  .steps .btn-name{
+    display: inline-block;
+    margin-left: 4px;
+    padding: 1px 9px;
+    border-radius: 4px;
+    background: var(--pine);
+    color: var(--paper);
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  h2{
+    margin-top: 48px;
+    font-size: 26px;
+  }
+  p, ul{
+    color: rgba(32,26,18,0.72);
+  }
+  .data-grid{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    margin-top: 18px;
+  }
+  @media (max-width: 640px){
+    .data-grid{ grid-template-columns: 1fr; }
+  }
+  .data-card{
+    background: #fff;
+    border: 1px solid var(--line-on-light);
+    border-radius: 8px;
+    padding: 22px 24px;
+  }
+  .data-card h3{
+    font-size: 18px;
+    margin-bottom: 10px;
+  }
+  .data-card ul{
+    margin: 0;
+    padding-left: 18px;
+  }
+  .data-card li{ margin: 6px 0; }
+  .keep{
+    background: rgba(75,37,69,0.06);
+  }
+
+  .email{
+    display: inline-block;
+    margin-top: 8px;
+    font-family: 'Fraunces', serif;
+    font-size: 20px;
+    text-decoration: none;
+    border-bottom: 2px solid var(--flesh);
+    padding-bottom: 2px;
+  }
+
+  .bg{
+    margin-top: 56px;
+    padding-top: 36px;
+    border-top: 1px solid var(--line-on-light);
+  }
+  .bg h2{ margin-top: 0; }
+
+  footer{
+    background: var(--pine-deep);
+    color: rgba(243,237,226,0.55);
+    font-size: 14px;
+    padding: 28px 0;
+  }
+  footer .wrap{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  footer .mark{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  footer .mark img{
+    width: 22px;
+    height: 22px;
+    border-radius: 4px;
+    object-fit: cover;
+  }
+  footer a{ text-decoration: none; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <a class="brand" href="index.html">
+      <img src="pinefig%20logo.png" alt="Pine Fig logo">
+      Pine Fig
+    </a>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="word-puzzle-tetromino-privacy.html">Privacy Policy</a>
+    </nav>
+  </div>
+</header>
+
+<main class="page">
+  <div class="wrap">
+    <p class="kicker">Word Puzzle Tetromino · Pine Fig (PineFig)</p>
+    <h1>Delete your Word Puzzle Tetromino profile</h1>
+    <p class="lede">This page is for the game <strong>Word Puzzle Tetromino</strong>, published by <strong>Pine Fig (PineFig)</strong>. Follow the steps below to delete your profile and the personal data stored with it.</p>
+
+    <ol class="steps">
+      <li>Open <strong>Word Puzzle Tetromino</strong>.</li>
+      <li>Go to the <strong>main menu</strong>.</li>
+      <li>Open <strong>Profile</strong>.</li>
+      <li>Tap <span class="btn-name">Delete profile</span></li>
+      <li>Confirm the deletion if the app asks you to.</li>
+    </ol>
+    <p>The profile is deleted as soon as you confirm. You do not need to create an account or log in to request this.</p>
+
+    <h2>What data is deleted or kept</h2>
+    <div class="data-grid">
+      <div class="data-card">
+        <h3>Deleted immediately</h3>
+        <ul>
+          <li>Profile name and other profile details</li>
+          <li>Profile customizations, including themes and avatar if you set them</li>
+          <li>Settings saved to that profile</li>
+          <li>Local game progress and statistics for that profile</li>
+        </ul>
+      </div>
+      <div class="data-card keep">
+        <h3>Kept / extra storage</h3>
+        <ul>
+          <li>No personal data from the deleted profile is kept.</li>
+          <li>There is <strong>no additional retention period</strong>.</li>
+          <li>Uninstalling the app is not the same as deleting a profile. Use the steps above.</li>
+        </ul>
+      </div>
+    </div>
+
+    <h2>Request deletion by email</h2>
+    <p>If you cannot use the in-app button, email us from the address tied to your play sessions and ask us to delete your Word Puzzle Tetromino profile.</p>
+    <a class="email" href="mailto:contact@pinefig.com?subject=Word%20Puzzle%20Tetromino%20profile%20deletion">contact@pinefig.com</a>
+    <p>We will handle email requests using that work address for Pine Fig. See also the <a href="word-puzzle-tetromino-privacy.html">Word Puzzle Tetromino Privacy Policy</a>.</p>
+
+    <section class="bg" lang="bg">
+      <h2>Изтриване на профил в Word Puzzle Tetromino</h2>
+      <p>Тази страница е за играта <strong>Word Puzzle Tetromino</strong> от разработчика <strong>Pine Fig (PineFig)</strong>.</p>
+      <ol class="steps">
+        <li>Отворете <strong>Word Puzzle Tetromino</strong>.</li>
+        <li>Отидете в <strong>главното меню</strong> (Main menu).</li>
+        <li>Отворете <strong>Profile</strong>.</li>
+        <li>Натиснете <span class="btn-name">Delete profile</span></li>
+        <li>Потвърдете изтриването, ако приложението поиска.</li>
+      </ol>
+      <p><strong>Изтрива се веднага:</strong> име и данни на профила, персонализации (включително теми и аватар), настройки, локален напредък и статистика за този профил.</p>
+      <p><strong>Не се запазва:</strong> лични данни от изтрития профил. Няма допълнителен период на съхранение.</p>
+      <p>Заявка по имейл: <a href="mailto:contact@pinefig.com?subject=Word%20Puzzle%20Tetromino%20profile%20deletion">contact@pinefig.com</a></p>
+    </section>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span class="mark"><img src="pinefig%20logo.png" alt="">© 2026 Pine Fig</span>
+    <a href="index.html">pinefig.com</a>
+  </div>
+</footer>
+
+</body>
+</html>
