@@ -3,20 +3,29 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sample Hero — Allure of the Supernal Codex</title>
-<meta name="description" content="Sample hero page for the Allure of the Supernal design codex. Placeholder content for visual review, not canonical game design.">
+<title>Hero encyclopedia — Allure of the Supernal Codex</title>
+<meta name="description" content="Private design encyclopedia for Allure of the Supernal. Heroes are files in the data folder on this PC.">
 <meta name="robots" content="noindex, nofollow">
 <link rel="icon" href="../pinefig%20logo.png" type="image/png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/design-system.css">
+<link rel="stylesheet" href="css/editor.css">
 </head>
 <body>
-<a class="skip" href="#overview">Skip to hero</a>
+<svg aria-hidden="true" focusable="false" width="0" height="0" style="position:absolute;overflow:hidden">
+  <filter id="rim-ripple" x="-10%" y="-10%" width="120%" height="120%" color-interpolation-filters="sRGB">
+    <feTurbulence type="fractalNoise" baseFrequency="0.018 0.03" numOctaves="2" seed="2" result="noise">
+      <animate attributeName="baseFrequency" values="0.016 0.028;0.024 0.018;0.016 0.028" dur="14s" repeatCount="indefinite"/>
+    </feTurbulence>
+    <feDisplacementMap in="SourceGraphic" in2="noise" scale="6" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+</svg>
+<a class="skip" href="#view">Skip to content</a>
 
 <header class="nav">
-  <a class="brand" href="index.html">
+  <a class="brand" href="#/">
     <img src="../pinefig%20logo.png" alt="">
     <span>
       <span class="name">Allure of the Supernal</span>
@@ -24,21 +33,32 @@
     </span>
   </a>
   <nav class="nav-links" aria-label="Codex">
-    <a href="#overview" aria-current="page">Hero</a>
-    <a href="#abilities">Abilities</a>
-    <span class="soon" title="Held until this hero page is approved">Items</span>
-    <span class="soon" title="Held until this hero page is approved">Maps</span>
-    <span class="soon" title="Held until this hero page is approved">Systems</span>
+    <a href="#/" data-nav="home">Directory</a>
+    <a href="#/create" data-nav="create">Create New Hero</a>
+    <a href="#/taxonomy" data-nav="taxonomy">Tags</a>
+    <span class="soon" title="Held until this layout is approved">Systems</span>
   </nav>
+  <div class="nav-actions">
+    <button type="button" class="btn tiny ghost" data-export title="Download a JSON copy of the data folder">Backup</button>
+    <button type="button" class="btn tiny ghost" data-import title="Replace the data folder from a backup file">Import</button>
+    <input data-import-file type="file" accept="application/json,.json" hidden>
+  </div>
   <form class="search" role="search" onsubmit="return false">
     <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="1.6"/><path d="M16 16.5L20 20.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-    <label class="sr-only" for="codex-search">Search this sample hero</label>
-    <input id="codex-search" data-search type="search" placeholder="Search this sample hero" autocomplete="off">
+    <label class="sr-only" for="codex-search">Search the encyclopedia</label>
+    <input id="codex-search" data-search type="search" placeholder="Search heroes and abilities" autocomplete="off">
     <div class="search-results" data-results></div>
   </form>
 </header>
 
-<main>
+<main id="view"></main>
+
+<template id="tpl-hero">
+  <div class="wrap">
+    <div class="crumbs" data-crumbs></div>
+    <div class="page-tools" data-tools></div>
+    <div class="notice" data-banner hidden></div>
+  </div>
   <section class="hero wrap" id="overview">
     <div class="kicker" data-kicker></div>
     <div class="title-row">
@@ -76,7 +96,7 @@
         <button type="button" data-filter="control" aria-pressed="false">Control</button>
       </div>
     </div>
-    <div class="ability-dock" data-dock role="tablist" aria-label="Sample abilities"></div>
+    <div class="ability-dock" data-dock role="tablist" aria-label="Hero abilities"></div>
     <article class="ability-card" data-card></article>
   </section>
 
@@ -88,18 +108,37 @@
   <section class="wrap">
     <div class="section-head">
       <h2>Linked entries</h2>
-      <p>Cross-links only. These records are not separate pages yet.</p>
+      <p>Stable ID links. Renames do not break references.</p>
     </div>
     <div class="related" data-related></div>
   </section>
-</main>
+</template>
 
 <footer class="site">
-  <span>Sample dossier for visual review. Not canonical Allure of the Supernal design.</span>
+  <span>Private design encyclopedia. Heroes, history, and images are files in the data folder on this PC.</span>
   <span>Pine Fig · private codex</span>
 </footer>
 
+<div id="modal-root"></div>
+<div id="toast-root"></div>
+
+<!-- Seed template, then store/render modules. data/bundle.js lets this file open directly. python server.py writes saves into data/. -->
 <script src="data/sample-hero.js"></script>
-<script src="js/codex.js"></script>
+<script src="data/bundle.js"></script>
+<script src="js/version.js"></script>
+<script src="js/schema.js"></script>
+<script src="js/diff.js"></script>
+<script src="js/store.js"></script>
+<script src="js/seed.js"></script>
+<script src="js/import-csv.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/hero-page.js"></script>
+<script src="js/search.js"></script>
+<script src="js/home.js"></script>
+<script src="js/history-view.js"></script>
+<script src="js/taxonomy.js"></script>
+<script src="js/editor.js"></script>
+<script src="js/router.js"></script>
+<script src="js/app.js"></script>
 </body>
 </html>

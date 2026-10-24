@@ -1,0 +1,23 @@
+[
+  {
+    "heroId": "sample-hero-01",
+    "versionTenths": 1,
+    "versionLabel": "0.1",
+    "timestamp": "2026-10-22T14:24:25.058Z",
+    "productionStateId": "state-draft",
+    "summary": "Hero created.",
+    "changeGroups": [
+      {
+        "type": "created",
+        "title": "Hero Created",
+        "changes": [
+          {
+            "field": "name",
+            "prev": "",
+            "next": "Sample Hero"
+          }
+        ]
+      }
+    ]
+  }
+]

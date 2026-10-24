@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Codex self-test</title>
+</head>
+<body>
+<pre id="out">Running…</pre>
+<script src="data/sample-hero.js"></script>
+<script src="js/version.js"></script>
+<script src="js/schema.js"></script>
+<script src="js/diff.js"></script>
+<script src="js/store.js"></script>
+<script src="js/seed.js"></script>
+<script src="js/import-csv.js"></script>
+<script>
+(async function () {
+  const out = document.getElementById("out");
+  const results = [];
+  function check(name, cond, extra) {
+    results.push({ name: name, pass: !!cond, extra: extra || "" });
+  }
+  try {
+    await Codex.store.open();
+    await Codex.seed.run();
+    const tax = await Codex.store.listTaxonomy();
+    const heroes = await Codex.store.listHeroes();
+    const sample = await Codex.store.getHero("sample-hero-01");
+    const card = heroes.find(function (h) { return h.id === "sample-hero-01"; });
+    check("seed sample hero", !!sample, sample && sample.name);
+    check("catalog lists sample without lore", !!card && card.lore == null && card.abilities && card.abilities[0] && card.abilities[0].summary == null);
+    check("sample name", sample && sample.name === "Sample Hero");
+    check("six stats", sample && sample.stats.length === 6 && sample.stats[0].id === "HP");
+    check("CRIT exists", !!(sample && sample.stats.find(function (s) { return s.id === "CRIT"; })));
+    check("four abilities", sample && sample.abilities.length === 4);
+    check("ability Unwritten Mark", sample && sample.abilities.some(function (ab) { return ab.name === "Unwritten Mark"; }));
+    check("queen movement squares", sample && sample.movement.squares.length > 10);
+    check("artwork path", sample && sample.artwork.value && sample.artwork.value.indexOf("sample-hero-01.jpg") !== -1);
+    check("version present", sample && sample.versionTenths >= 1);
+
+    const csvTarget = Codex.schema.clone(sample);
+    const originalHp = csvTarget.stats[0].value;
+    const csv = Codex.csv.previewStats("code,value\nHP,150\nHPR,4\nAD,18\nATR,2\nARM,12\nCRIT,8%\n", csvTarget);
+    check("csv maps HP", csv.ok && csv.mappings.some(function (m) { return m.id === "HP" && m.next === "150"; }));
+    const afterCsv = Codex.csv.applyStats(csvTarget, csv.mappings);
+    check("csv apply only changes copy", csvTarget.stats[0].value === originalHp && afterCsv.stats[0].value === "150");
+
+    const noChange = Codex.diff.diffHeroes(sample, sample, tax);
+    check("identical heroes have no diff", !noChange.hasChanges);
+
+    const edited = Codex.schema.clone(sample);
+    edited.stats.find(function (s) { return s.id === "AD"; }).value = "22";
+    edited.abilities[1].cooldown = "7s";
+    edited.lore = ["Revised lore paragraph."];
+    edited.movement.squares = edited.movement.squares.concat([{ row: 0, col: 1 }]);
+    const diff = Codex.diff.diffHeroes(sample, edited, tax);
+    check("diff detects stats", diff.groups.some(function (g) { return g.type === "stats"; }));
+    check("diff detects ability", diff.groups.some(function (g) { return g.type === "ability"; }));
+    check("diff detects lore", diff.groups.some(function (g) { return g.type === "lore"; }));
+    check("diff detects movement", diff.groups.some(function (g) { return g.type === "movement"; }));
+
+    const testId = "self-test-hero";
+    try { await Codex.store.deleteHero(testId); } catch (e) {}
+    const newbie = Codex.schema.emptyHero();
+    newbie.id = testId;
+    newbie.name = "Self Test";
+    newbie.stats = Codex.schema.defaultStats({ HP: "10", HPR: "1", AD: "2", ATR: "1", ARM: "1", CRIT: "0%" });
+    newbie.abilities = [Codex.schema.defaultAbility("1")];
+    newbie.abilities[0].name = "Test Strike";
+    newbie.abilities[0].summary = "A distinctive test phrase for search.";
+    const created = await Codex.store.saveHero(newbie);
+    check("create starts at 0.1", created.saved && created.version === "0.1");
+    const listed = await Codex.store.listHeroes();
+    check("new hero appears in directory data", listed.some(function (h) { return h.id === testId; }));
+
+    const again = await Codex.store.saveHero(await Codex.store.getHero(testId));
+    check("save without changes is skipped", again.saved === false && again.reason === "no-changes");
+
+    const current = await Codex.store.getHero(testId);
+    current.stats.find(function (s) { return s.id === "HP"; }).value = "11";
+    const saved = await Codex.store.saveHero(current);
+    check("stat save increments to 0.2", saved.saved && saved.version === "0.2");
+    const hist = await Codex.store.listHistory(testId);
+    check("history has two versions", hist.length === 2);
+    const detail = hist.find(function (h) { return h.versionLabel === "0.2"; });
+    check("history records previous and next HP", !!(detail && JSON.stringify(detail.changeGroups).indexOf("10") !== -1 && JSON.stringify(detail.changeGroups).indexOf("11") !== -1));
+
+    Codex.store.failNextSave = true;
+    const failHero = await Codex.store.getHero(testId);
+    failHero.stats.find(function (s) { return s.id === "HP"; }).value = "99";
+    let failed = false;
+    try { await Codex.store.saveHero(failHero); } catch (e) { failed = true; }
+    const afterFail = await Codex.store.getHero(testId);
+    check("failed save throws", failed);
+    check("failed save does not bump version", afterFail.currentVersion === "0.2" && afterFail.stats.find(function (s) { return s.id === "HP"; }).value === "11");
+
+    const snap = await Codex.store.getSnapshot(testId, 1);
+    const restoredData = Codex.schema.normalizeHero(snap.hero);
+    restoredData.id = testId;
+    const restored = await Codex.store.saveHero(restoredData, { restoreFrom: "0.1" });
+    check("restore creates new version", restored.saved && restored.version === "0.3");
+    const hist2 = await Codex.store.listHistory(testId);
+    check("restore keeps previous history", hist2.length === 3);
+    const now = await Codex.store.getHero(testId);
+    check("restore copies old HP", now.stats.find(function (s) { return s.id === "HP"; }).value === "10");
+
+    const versionFmt = [];
+    let t = 1;
+    for (let i = 0; i < 12; i += 1) { versionFmt.push(Codex.version.tenthsToString(t)); t = Codex.version.nextTenths(t); }
+    check("version sequence", versionFmt.join(",") === "0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0,1.1,1.2");
+
+    await Codex.store.deleteHero(testId);
+    const gone = await Codex.store.getHero(testId);
+    check("cleanup deleted test hero", !gone);
+  } catch (err) {
+    check("runner", false, String(err && err.stack || err));
+  }
+  const failed = results.filter(function (r) { return !r.pass; });
+  document.body.dataset.done = failed.length ? "fail" : "pass";
+  out.textContent = (failed.length ? "FAIL " + failed.length + "\n" : "PASS\n") + JSON.stringify(results, null, 2);
+})();
+</script>
+</body>
+</html>

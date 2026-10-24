@@ -1,0 +1,111 @@
+[
+  {
+    "id": "sample-hero-01",
+    "name": "Sample Hero",
+    "epithet": "Design Exemplar",
+    "productionStateId": "state-draft",
+    "tierId": "tier-3",
+    "roleIds": [
+      "role-vanguard",
+      "role-controller"
+    ],
+    "tagIds": [],
+    "stats": [
+      {
+        "id": "HP",
+        "code": "HP",
+        "value": "120"
+      },
+      {
+        "id": "HPR",
+        "code": "HPR",
+        "value": "4"
+      },
+      {
+        "id": "AD",
+        "code": "AD",
+        "value": "18"
+      },
+      {
+        "id": "ATR",
+        "code": "ATR",
+        "value": "2"
+      },
+      {
+        "id": "ARM",
+        "code": "ARM",
+        "value": "12"
+      },
+      {
+        "id": "CRIT",
+        "code": "CRIT",
+        "value": "8%"
+      }
+    ],
+    "artwork": {
+      "kind": "path",
+      "value": "images/heroes/sample-hero-01.jpg"
+    },
+    "updatedAt": "2026-10-22T14:24:25.058Z",
+    "createdAt": "2026-10-22T14:24:25.046Z",
+    "currentVersion": "0.1",
+    "versionTenths": 1,
+    "abilities": [
+      {
+        "id": "a1",
+        "name": "Unwritten Mark",
+        "tagIds": [
+          "tag-damage"
+        ]
+      },
+      {
+        "id": "a2",
+        "name": "Gilded Arc",
+        "tagIds": [
+          "tag-damage",
+          "tag-control"
+        ]
+      },
+      {
+        "id": "a3",
+        "name": "Step Between",
+        "tagIds": [
+          "tag-movement"
+        ]
+      },
+      {
+        "id": "a4",
+        "name": "Binding Halo",
+        "tagIds": [
+          "tag-control"
+        ]
+      }
+    ],
+    "related": [
+      {
+        "id": "link-mvjmtvbq7uitgw",
+        "targetType": "external",
+        "targetId": "",
+        "name": "Sample Rival",
+        "note": "Linked entity. No page yet — held until this layout is approved.",
+        "type": "Hero"
+      },
+      {
+        "id": "link-mvjmtvbqmjha7q",
+        "targetType": "external",
+        "targetId": "",
+        "name": "Ember Phylactery",
+        "note": "Sample item referenced by the ultimate. Not a real item.",
+        "type": "Item"
+      },
+      {
+        "id": "link-mvjmtvbqwbvxbh",
+        "targetType": "external",
+        "targetId": "",
+        "name": "Choir Steps",
+        "note": "Sample battlefield name used only to show a cross-link.",
+        "type": "Map"
+      }
+    ]
+  }
+]
