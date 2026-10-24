@@ -33,8 +33,9 @@
   }
 
   function renderBoard(movement, editable) {
-    const size = movement.size || 7;
-    const origin = movement.origin || { row: Math.floor(size / 2), col: Math.floor(size / 2) };
+    const setupBoard = Codex.schema.board();
+    const size = setupBoard.size;
+    const origin = setupBoard.origin;
     const reach = {};
     (movement.squares || []).forEach(function (sq) { reach[Codex.schema.squareKey(sq)] = true; });
     const cells = [];
@@ -53,14 +54,11 @@
       }
     }
     const flags = [];
-    if (movement.canJump) flags.push("Jumps");
     if (movement.intermediateMustBeEmpty) flags.push("Needs a clear path");
-    if (movement.blockedByFriendly) flags.push("Blocked by allies");
-    if (movement.blockedByEnemy) flags.push("Blocked by enemies");
     return (
-      '<div><h3>Movement</h3>' +
-      '<p data-move-tip>' + esc(movement.note || "Reachable squares in one turn.") + (flags.length ? " " + esc(flags.join(" · ")) : "") + "</p></div>" +
-      '<div class="board" style="grid-template-columns:repeat(' + size + ',minmax(0,1fr))" role="img" aria-label="' + esc(movement.note || "Movement") + '">' +
+      '<div><h3>' + esc(setupBoard.label) + "</h3>" +
+      '<p data-move-tip>' + esc(setupBoard.note) + (flags.length ? " " + esc(flags.join(" · ")) : "") + "</p></div>" +
+      '<div class="board" style="grid-template-columns:repeat(' + size + ',minmax(0,1fr))" role="img" aria-label="' + esc(setupBoard.note) + '">' +
       cells.join("") + "</div>"
     );
   }
@@ -201,10 +199,8 @@
     live.iconSrc = {};
 
     root.dataset.edit = mode === "edit" ? "on" : "off";
-    const theme = hero.theme || Codex.schema.DEFAULT_THEME;
-    document.documentElement.style.setProperty("--accent", theme.accent);
-    document.documentElement.style.setProperty("--accent-2", theme.accent2);
-    document.documentElement.style.setProperty("--glow", theme.glow);
+    const theme = Codex.schema.themeFor(hero);
+    Codex.ui.applyTheme(theme);
     document.title = hero.name + " — Allure of the Supernal Codex";
 
     const artSrc = await Codex.ui.resolveSrc(hero.artwork);
@@ -266,12 +262,17 @@
       const tagOpts = Codex.schema.taxByType(tax, "tag").map(function (item) {
         return '<label class="check"><input type="checkbox" data-tag-id="' + esc(item.id) + '"' + (hero.tagIds.indexOf(item.id) !== -1 ? " checked" : "") + "> " + esc(item.name) + "</label>";
       }).join("");
+      const allegianceOpts = '<option value="">None</option>' + Codex.schema.taxByType(tax, "allegiance").map(function (item) {
+        return '<option value="' + esc(item.id) + '"' + (item.id === hero.allegianceId ? " selected" : "") + ">" + esc(item.name) + "</option>";
+      }).join("");
       const stateOpts = Codex.schema.taxByType(tax, "productionState").map(function (item) {
         return '<option value="' + esc(item.id) + '"' + (item.id === hero.productionStateId ? " selected" : "") + ">" + esc(item.name) + "</option>";
       }).join("");
       tierHtml +=
         '<div class="edit-stack">' +
           '<label>Tier <select data-field="tierId">' + tierOpts + "</select></label>" +
+          '<label>Allegiance <select data-field="allegianceId">' + allegianceOpts + "</select></label>" +
+          '<p class="hint">Colour theme: ' + esc(theme.name) + ' (picked from tier, role and allegiance in <a class="text-link" href="#/setup">Setup</a>).</p>' +
           '<label>Production state <select data-field="productionStateId">' + stateOpts + "</select></label>" +
           '<div><span class="mini-label">Roles</span><div class="chip-picks">' + roleOpts + '</div><button type="button" class="btn tiny" data-new-tax="role">New role</button></div>' +
           '<div><span class="mini-label">Tags</span><div class="chip-picks">' + tagOpts + '</div><button type="button" class="btn tiny" data-new-tax="tag">New tag</button></div>' +
@@ -279,7 +280,8 @@
           '<label>Phase <input data-field="phase" value="' + esc(hero.phase) + '"></label>' +
         "</div>";
     } else {
-      tierHtml += '<div class="role-stack">' + roles.map(function (role) {
+      const allegiance = taxMap[hero.allegianceId];
+      tierHtml += '<div class="role-stack">' + (allegiance ? '<span class="chip">' + esc(allegiance.name) + "</span>" : "") + roles.map(function (role) {
         return '<span class="chip ghost">' + esc(role) + "</span>";
       }).join("") + (tags.length ? tags.map(function (tag) {
         return '<span class="chip">' + esc(tag) + "</span>";
@@ -288,12 +290,15 @@
     root.querySelector("[data-tier]").innerHTML = tierHtml;
 
     const snapshot = root.querySelector("[data-snapshot]");
-    snapshot.innerHTML = Codex.schema.statPairs(hero.stats).map(function (row) {
+    const shownStats = Codex.schema.statDefs().map(function (def) {
+      return hero.stats.find(function (stat) { return stat.id === def.id; }) || { id: def.id, value: def.defaultValue };
+    });
+    snapshot.innerHTML = Codex.schema.statPairs(shownStats).map(function (row) {
       return '<div class="stat-row">' + row.map(function (stat) {
         const value = mode === "edit"
           ? '<input class="stat-input" data-stat-id="' + esc(stat.id) + '" value="' + esc(stat.value) + '">'
           : esc(stat.value);
-        return '<div class="stat-pill"><span><span class="code">' + esc(stat.code) + '</span><span class="name">' + esc(stat.name) + "</span></span><strong>" + value + "</strong></div>";
+        return '<div class="stat-pill"><span><span class="code">' + esc(stat.id) + '</span><span class="name">' + esc(Codex.schema.statName(stat.id)) + "</span></span><strong>" + value + "</strong></div>";
       }).join("") + "</div>";
     }).join("");
     if (mode === "edit") {
@@ -306,11 +311,7 @@
       movement.insertAdjacentHTML("beforeend",
         '<p class="hint">Click a square to toggle whether this hero can reach it in one turn.</p>' +
         '<div class="move-form">' +
-          '<label class="wide">Movement note <input data-move="note" value="' + esc(hero.movement.note || "") + '" placeholder="Describe the pattern"></label>' +
-          '<label class="check"><input type="checkbox" data-move-flag="canJump"' + (hero.movement.canJump ? " checked" : "") + "> Can jump over pieces</label>" +
           '<label class="check"><input type="checkbox" data-move-flag="intermediateMustBeEmpty"' + (hero.movement.intermediateMustBeEmpty ? " checked" : "") + "> Intermediate squares must be empty</label>" +
-          '<label class="check"><input type="checkbox" data-move-flag="blockedByFriendly"' + (hero.movement.blockedByFriendly ? " checked" : "") + "> Blocked by friendly pieces</label>" +
-          '<label class="check"><input type="checkbox" data-move-flag="blockedByEnemy"' + (hero.movement.blockedByEnemy ? " checked" : "") + "> Blocked by enemy pieces</label>" +
         "</div>"
       );
     }

@@ -86,11 +86,6 @@
         const stat = hero.stats.find(function (s) { return s.id === t.getAttribute("data-stat-id"); });
         if (stat) { stat.value = t.value; markDirty(); }
       }
-      if (t.matches("[data-move]")) {
-        const key = t.getAttribute("data-move");
-        hero.movement[key] = t.value;
-        markDirty();
-      }
     });
 
     root.addEventListener("change", function (event) {
@@ -105,9 +100,13 @@
         toggleId(hero.tagIds, t.getAttribute("data-tag-id"), t.checked);
         markDirty();
       }
-      if (t.matches('[data-field="tierId"], [data-field="productionStateId"]')) {
+      if (t.matches('[data-field="tierId"], [data-field="productionStateId"], [data-field="allegianceId"]')) {
         hero[t.getAttribute("data-field")] = t.value;
         markDirty();
+      }
+      // Tier, roles and allegiance pick the colour theme; preview it while editing.
+      if (t.matches('[data-role-id], [data-field="tierId"], [data-field="allegianceId"]')) {
+        Codex.ui.applyTheme(Codex.schema.themeFor(hero));
       }
       if (t.matches("[data-move-flag]")) {
         hero.movement[t.getAttribute("data-move-flag")] = t.checked;
@@ -517,7 +516,7 @@
         (preview.warnings.length ? "<ul class=\"warn\">" + preview.warnings.map(function (e) { return "<li>" + esc(e) + "</li>"; }).join("") + "</ul>" : "") +
         '<table class="preview-table"><thead><tr><th>Stat</th><th>Current</th><th>Incoming</th></tr></thead><tbody>' +
         preview.mappings.map(function (row) {
-          return "<tr><td>" + esc(row.code + " " + row.name) + "</td><td>" + esc(row.current) + "</td><td>" + esc(row.next) + "</td></tr>";
+          return "<tr><td>" + esc(row.id + " " + row.name) + "</td><td>" + esc(row.current) + "</td><td>" + esc(row.next) + "</td></tr>";
         }).join("") + "</tbody></table>" +
         '<div class="modal-actions"><button type="button" class="btn ghost" data-dismiss>Cancel</button>' +
         (preview.ok ? '<button type="button" class="btn primary" data-apply-csv>Apply to draft</button>' : "") + "</div>"
@@ -632,10 +631,10 @@
       }
       if (step === 2) {
         form.innerHTML =
-          '<div class="wide wizard-section-head">Six stats</div>' +
-          Codex.schema.STAT_DEFS.map(function (def) {
+          '<div class="wide wizard-section-head">Stats</div>' +
+          Codex.schema.statDefs().map(function (def) {
             const stat = draftHero.stats.find(function (s) { return s.id === def.id; });
-            return '<label>' + esc(def.code + " — " + def.name) + ' <input data-stat-id="' + def.id + '" value="' + esc(stat.value) + '"></label>';
+            return '<label>' + esc(def.id + " — " + def.name) + ' <input data-stat-id="' + esc(def.id) + '" value="' + esc(stat ? stat.value : def.defaultValue) + '"></label>';
           }).join("") +
           '<div class="wide wizard-section-head">Movement pattern</div>' +
           '<div class="wide"><p class="hint">Click a square to mark where this hero can reach in one turn. The centre square is the hero.</p>' +
@@ -655,6 +654,7 @@
           '<label>Tier <select name="tierId">' + Codex.schema.taxByType(tax, "tier").map(function (item) {
             return '<option value="' + esc(item.id) + '"' + (item.id === draftHero.tierId ? " selected" : "") + ">" + esc(item.name) + "</option>";
           }).join("") + "</select></label>" +
+          '<label>Allegiance <select name="allegianceId">' + allegianceOptions(tax, draftHero.allegianceId) + "</select></label>" +
           '<label>Production state <select name="productionStateId">' + Codex.schema.taxByType(tax, "productionState").map(function (item) {
             return '<option value="' + esc(item.id) + '"' + (item.id === draftHero.productionStateId ? " selected" : "") + ">" + esc(item.name) + "</option>";
           }).join("") + "</select></label>" +
@@ -710,6 +710,7 @@
       if (data.has("lore")) draftHero.lore = String(data.get("lore") || "").split(/\n\s*\n/).map(function (p) { return p.trim(); }).filter(Boolean);
       if (data.has("tierId")) draftHero.tierId = String(data.get("tierId"));
       if (data.has("productionStateId")) draftHero.productionStateId = String(data.get("productionStateId"));
+      if (data.has("allegianceId")) draftHero.allegianceId = String(data.get("allegianceId"));
       form.querySelectorAll("[data-stat-id]").forEach(function (input) {
         const stat = draftHero.stats.find(function (s) { return s.id === input.getAttribute("data-stat-id"); });
         if (stat) stat.value = input.value;
@@ -720,9 +721,16 @@
     paint();
   }
 
+  function allegianceOptions(tax, selectedId) {
+    const esc = Codex.schema.escapeHtml;
+    return '<option value="">None</option>' + Codex.schema.taxByType(tax, "allegiance").map(function (item) {
+      return '<option value="' + esc(item.id) + '"' + (item.id === selectedId ? " selected" : "") + ">" + esc(item.name) + "</option>";
+    }).join("");
+  }
+
   function renderMiniBoard(movement) {
-    const size = movement.size || 7;
-    const origin = movement.origin;
+    const size = Codex.schema.board().size;
+    const origin = Codex.schema.board().origin;
     const reach = {};
     (movement.squares || []).forEach(function (sq) { reach[Codex.schema.squareKey(sq)] = true; });
     let html = '<p class="mini-label">Click squares this hero can reach.</p><div class="board" style="grid-template-columns:repeat(' + size + ',minmax(0,1fr))">';

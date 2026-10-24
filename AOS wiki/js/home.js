@@ -9,11 +9,25 @@
     tiers: {},
     states: {},
     statMin: {},
-    statMax: {}
+    statMax: {},
+    filtersOpen: false
   };
+  // Below this many heroes the full directory already fits on screen, so a
+  // "Recently updated" row would only repeat the same cards.
+  const RECENT_MIN_HEROES = 8;
+  const RECENT_COUNT = 4;
 
   function selected(map) {
     return Object.keys(map).filter(function (key) { return map[key]; });
+  }
+
+  function filled(map) {
+    return Object.keys(map).filter(function (key) { return map[key] != null && map[key] !== ""; });
+  }
+
+  function activeFilterCount() {
+    return selected(state.roles).length + selected(state.tags).length + selected(state.tiers).length +
+      selected(state.states).length + filled(state.statMin).length + filled(state.statMax).length;
   }
 
   function matches(hero, tax) {
@@ -28,7 +42,7 @@
     })) return false;
     if (tiers.length && tiers.indexOf(hero.tierId) === -1) return false;
     if (states.length && states.indexOf(hero.productionStateId) === -1) return false;
-    return Codex.schema.STAT_DEFS.every(function (def) {
+    return Codex.schema.statDefs().every(function (def) {
       const stat = (hero.stats || []).find(function (item) { return item.id === def.id; });
       const num = Codex.schema.parseStatNumber(stat && stat.value);
       const min = state.statMin[def.id];
@@ -79,7 +93,7 @@
     const roles = (hero.roleIds || []).map(function (id) { return taxMap[id] && taxMap[id].name; }).filter(Boolean);
     const tags = (hero.tagIds || []).map(function (id) { return taxMap[id] && taxMap[id].name; }).filter(Boolean);
     const stats = (hero.stats || []).slice(0, 4).map(function (stat) {
-      return '<span><i>' + esc(stat.code) + "</i> " + esc(stat.value) + "</span>";
+      return '<span><i>' + esc(stat.id) + "</i> " + esc(stat.value) + "</span>";
     }).join("");
     return (
       '<a class="hero-card" href="#/hero/' + encodeURIComponent(hero.id) + '">' +
@@ -108,19 +122,22 @@
   async function render(mount, heroes, tax) {
     const esc = Codex.schema.escapeHtml;
     const filtered = sortHeroes(heroes.filter(function (hero) { return matches(hero, tax); }), tax);
-    const recent = heroes.slice().sort(function (a, b) { return String(b.updatedAt).localeCompare(String(a.updatedAt)); }).slice(0, 4);
+    const activeCount = activeFilterCount();
+    const recent = heroes.length >= RECENT_MIN_HEROES && !activeCount
+      ? heroes.slice().sort(function (a, b) { return String(b.updatedAt).localeCompare(String(a.updatedAt)); }).slice(0, RECENT_COUNT)
+      : [];
 
     const sortOpts = [
       ["updatedAt", "Recent updates"],
       ["name", "Name"],
       ["tier", "Tier"],
       ["production", "Production state"]
-    ].concat(Codex.schema.STAT_DEFS.map(function (def) { return [def.id, def.name]; }));
+    ].concat(Codex.schema.statDefs().map(function (def) { return [def.id, def.name]; }));
 
-    const statFilters = Codex.schema.STAT_DEFS.map(function (def) {
-      return '<label class="stat-range">' + esc(def.code) +
-        ' <input type="number" data-stat-min="' + def.id + '" placeholder="min" value="' + esc(state.statMin[def.id] || "") + '">' +
-        ' <input type="number" data-stat-max="' + def.id + '" placeholder="max" value="' + esc(state.statMax[def.id] || "") + '">' +
+    const statFilters = Codex.schema.statDefs().map(function (def) {
+      return '<label class="stat-range" title="' + esc(def.name) + '">' + esc(def.id) +
+        ' <input type="number" data-stat-min="' + esc(def.id) + '" placeholder="min" value="' + esc(state.statMin[def.id] || "") + '">' +
+        ' <input type="number" data-stat-max="' + esc(def.id) + '" placeholder="max" value="' + esc(state.statMax[def.id] || "") + '">' +
         "</label>";
     }).join("");
 
@@ -137,6 +154,9 @@
         "</div>" +
         (recent.length ? '<div class="section-head tight"><h2>Recently updated</h2></div>' + recentHtml : "") +
         '<div class="dir-toolbar">' +
+          '<button type="button" class="btn ghost filter-toggle' + (activeCount ? " has-active" : "") + '" data-toggle-filters aria-expanded="' + state.filtersOpen + '" aria-controls="dir-filters">' +
+            "Filters" + (activeCount ? ' <span class="filter-count" aria-label="' + activeCount + ' active">' + activeCount + "</span>" : "") +
+          "</button>" +
           '<div class="view-toggle">' +
             '<button type="button" data-view="grid" aria-pressed="' + (state.view === "grid") + '">Grid</button>' +
             '<button type="button" data-view="list" aria-pressed="' + (state.view === "list") + '">List</button>' +
@@ -145,9 +165,10 @@
             return '<option value="' + opt[0] + '"' + (state.sort === opt[0] ? " selected" : "") + ">" + esc(opt[1]) + "</option>";
           }).join("") + "</select></label>" +
           '<label>Direction <select data-dir><option value="desc"' + (state.dir === "desc" ? " selected" : "") + '>Descending</option><option value="asc"' + (state.dir === "asc" ? " selected" : "") + ">Ascending</option></select></label>" +
-          '<button type="button" class="btn ghost" data-clear-filters>Clear filters</button>' +
+          (activeCount ? '<button type="button" class="btn ghost" data-clear-filters>Clear filters</button>' : "") +
+          '<span class="dir-count">' + filtered.length + " of " + heroes.length + (heroes.length === 1 ? " hero" : " heroes") + "</span>" +
         "</div>" +
-        '<div class="dir-filters">' +
+        '<div class="dir-filters" id="dir-filters"' + (state.filtersOpen ? "" : " hidden") + ">" +
           chipGroup("Roles", Codex.schema.taxByType(tax, "role"), state.roles, "roles") +
           chipGroup("Tags", Codex.schema.taxByType(tax, "tag"), state.tags, "tags") +
           chipGroup("Tiers", Codex.schema.taxByType(tax, "tier"), state.tiers, "tiers") +
@@ -175,10 +196,18 @@
         Codex.router.refresh();
       });
     });
-    mount.querySelector("[data-clear-filters]").addEventListener("click", function () {
-      state.roles = {}; state.tags = {}; state.tiers = {}; state.states = {}; state.statMin = {}; state.statMax = {};
-      Codex.router.refresh();
+    mount.querySelector("[data-toggle-filters]").addEventListener("click", function (event) {
+      state.filtersOpen = !state.filtersOpen;
+      event.currentTarget.setAttribute("aria-expanded", String(state.filtersOpen));
+      mount.querySelector("#dir-filters").hidden = !state.filtersOpen;
     });
+    const clear = mount.querySelector("[data-clear-filters]");
+    if (clear) {
+      clear.addEventListener("click", function () {
+        state.roles = {}; state.tags = {}; state.tiers = {}; state.states = {}; state.statMin = {}; state.statMax = {};
+        Codex.router.refresh();
+      });
+    }
     mount.querySelectorAll("[data-filter-key]").forEach(function (btn) {
       btn.addEventListener("click", function () {
         const key = btn.getAttribute("data-filter-key");

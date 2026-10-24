@@ -13,6 +13,7 @@
     const parts = raw.split("/").filter(Boolean);
     if (parts[0] === "create") return { name: "create", parts: parts, query: query };
     if (parts[0] === "taxonomy") return { name: "taxonomy", parts: parts, query: query };
+    if (parts[0] === "setup") return { name: "setup", parts: parts, query: query };
     if (parts[0] === "search") return { name: "search", parts: parts, query: query };
     if (parts[0] === "hero" && parts[1]) {
       if (parts[2] === "edit") return { name: "edit", id: parts[1], parts: parts, query: query };
@@ -88,6 +89,45 @@
     }
   }
 
+  // ---------- scroll memory ----------
+  // Each page remembers where it was left. Moving to another page restores that page's
+  // position (top on first visit); re-rendering the same page (filters, saves) keeps the
+  // current position. A hero's view and edit pages share one position.
+  const SCROLL_KEY = "aos-codex-scroll";
+  const LOADING_DELAY_MS = 150;
+  const scroll = { memory: {}, currentKey: null, settling: false };
+
+  function scrollKey(hash) {
+    return String(hash || "#/").replace(/\/edit$/, "");
+  }
+
+  function loadScrollMemory() {
+    try { scroll.memory = JSON.parse(sessionStorage.getItem(SCROLL_KEY) || "{}") || {}; } catch (err) { scroll.memory = {}; }
+  }
+
+  function saveScrollMemory() {
+    try { sessionStorage.setItem(SCROLL_KEY, JSON.stringify(scroll.memory)); } catch (err) { /* private mode: memory only */ }
+  }
+
+  function rememberScroll() {
+    if (scroll.settling || scroll.currentKey === null) return;
+    scroll.memory[scroll.currentKey] = window.scrollY;
+  }
+
+  function scrollToY(y) {
+    window.scrollTo({ top: y, left: 0, behavior: "instant" });
+  }
+
+  // Late-loading images can make the page too short for the first attempt; retry once.
+  function restoreScroll(y) {
+    scrollToY(y);
+    if (window.scrollY >= y) return;
+    const landed = window.scrollY;
+    window.setTimeout(function () {
+      if (window.scrollY === landed) scrollToY(y);
+    }, 300);
+  }
+
   async function render() {
     if (!location.hash) {
       location.hash = "#/";
@@ -95,12 +135,33 @@
     }
     const route = parse();
     const view = document.getElementById("view");
+    const key = scrollKey(location.hash);
+    const navigating = key !== scroll.currentKey;
+    const targetY = navigating ? (scroll.memory[key] || 0) : window.scrollY;
+    scroll.currentKey = key;
+    scroll.settling = true;
+    const loadingTimer = window.setTimeout(function () {
+      view.classList.add("is-loading");
+      view.setAttribute("aria-busy", "true");
+    }, LOADING_DELAY_MS);
+    try {
+      await renderRoute(route, view);
+    } finally {
+      window.clearTimeout(loadingTimer);
+      view.classList.remove("is-loading");
+      view.removeAttribute("aria-busy");
+      // An ability link scrolls itself to the Abilities section.
+      if (!(navigating && route.abilityId)) restoreScroll(targetY);
+      scroll.settling = false;
+      rememberScroll();
+    }
+  }
+
+  async function renderRoute(route, view) {
     Codex.heroPage.destroy();
     Codex.editor.draft = null;
     view.dataset.edit = "off";
-    document.documentElement.style.setProperty("--accent", "#f0c67a");
-    document.documentElement.style.setProperty("--accent-2", "#ff7340");
-    document.documentElement.style.setProperty("--glow", "rgba(240, 198, 122, 0.45)");
+    Codex.ui.applyTheme(Codex.schema.themeFor(null));
 
     try {
       const nav = document.querySelector(".nav");
@@ -124,6 +185,12 @@
         document.title = "Tags & states — Allure of the Supernal Codex";
         const [heroes, tax] = await Promise.all([Codex.store.listHeroes(), Codex.store.listTaxonomy()]);
         await Codex.taxonomy.render(view, tax, heroes);
+        return;
+      }
+      if (route.name === "setup") {
+        Codex.ui.navCurrent("setup");
+        document.title = "Setup — Allure of the Supernal Codex";
+        await Codex.setupPage.render(view, await Codex.store.listTaxonomy());
         return;
       }
       if (route.name === "search") {
@@ -204,7 +271,20 @@
   }
 
   function start() {
-    window.addEventListener("hashchange", render);
+    if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+    loadScrollMemory();
+    let queued = false;
+    window.addEventListener("scroll", function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; rememberScroll(); });
+    }, { passive: true });
+    window.addEventListener("pagehide", saveScrollMemory);
+    window.addEventListener("hashchange", function () {
+      rememberScroll();
+      saveScrollMemory();
+      render();
+    });
     render();
   }
 

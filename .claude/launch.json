@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "codex",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["AOS wiki/server.py", "8765"],
+      "port": 8765
+    }
+  ]
+}

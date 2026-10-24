@@ -13,32 +13,26 @@
     "stats": [
       {
         "id": "HP",
-        "code": "HP",
         "value": "120"
       },
       {
         "id": "HPR",
-        "code": "HPR",
         "value": "4"
       },
       {
         "id": "AD",
-        "code": "AD",
         "value": "18"
       },
       {
         "id": "ATR",
-        "code": "ATR",
         "value": "2"
       },
       {
         "id": "ARM",
-        "code": "ARM",
         "value": "12"
       },
       {
         "id": "CRIT",
-        "code": "CRIT",
         "value": "8%"
       }
     ],
@@ -106,6 +100,7 @@
         "note": "Sample battlefield name used only to show a cross-link.",
         "type": "Map"
       }
-    ]
+    ],
+    "allegianceId": ""
   }
 ]

@@ -17,30 +17,15 @@ window.SAMPLE_HERO = {
     artwork: {
       src: "images/heroes/sample-hero-01.jpg"
     },
-    theme: {
-      accent: "#f0c67a",
-      accent2: "#ff7340",
-      glow: "rgba(240, 198, 122, 0.45)"
-    },
+    /* Stat names live in data/setup.json; heroes only carry ids and values. */
     stats: [
-      [
-        { code: "HP", name: "Health", value: "120" },
-        { code: "HPR", name: "Regen", value: "4" }
-      ],
-      [
-        { code: "AD", name: "Attack", value: "18" },
-        { code: "ATR", name: "Range", value: "2" }
-      ],
-      [
-        { code: "ARM", name: "Armor", value: "12" },
-        { code: "CRIT", name: "Crit", value: "8%" }
-      ]
+      { id: "HP", value: "120" },
+      { id: "HPR", value: "4" },
+      { id: "AD", value: "18" },
+      { id: "ATR", value: "2" },
+      { id: "ARM", value: "12" },
+      { id: "CRIT", value: "8%" }
     ],
-    movement: {
-      label: "Movement",
-      note: "Squares marked + can be reached in one turn.",
-      size: 7
-    },
     lore: [
       "Sample. This paragraph exists so the lore column can be judged for measure, contrast, and pace. It is not backstory for Allure of the Supernal.",
       "Sample. A second paragraph shows how longer reading text sits beside the draft history. Replace both blocks with real writing after this layout is approved."

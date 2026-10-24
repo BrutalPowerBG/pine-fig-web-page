@@ -17,63 +17,33 @@
     "kind": "path",
     "value": "images/heroes/sample-hero-01.jpg"
   },
-  "theme": {
-    "accent": "#f0c67a",
-    "accent2": "#ff7340",
-    "glow": "rgba(240, 198, 122, 0.45)"
-  },
   "stats": [
     {
       "id": "HP",
-      "code": "HP",
-      "name": "Health",
-      "description": "Hit points.",
       "value": "120"
     },
     {
       "id": "HPR",
-      "code": "HPR",
-      "name": "Regen",
-      "description": "Health recovered each turn.",
       "value": "4"
     },
     {
       "id": "AD",
-      "code": "AD",
-      "name": "Attack",
-      "description": "Base attack damage.",
       "value": "18"
     },
     {
       "id": "ATR",
-      "code": "ATR",
-      "name": "Range",
-      "description": "Attack reach in tiles.",
       "value": "2"
     },
     {
       "id": "ARM",
-      "code": "ARM",
-      "name": "Armor",
-      "description": "Incoming damage reduction.",
       "value": "12"
     },
     {
       "id": "CRIT",
-      "code": "CRIT",
-      "name": "Crit",
-      "description": "Chance to deal a critical hit.",
       "value": "8%"
     }
   ],
   "movement": {
-    "label": "Movement",
-    "note": "Squares marked + can be reached in one turn.",
-    "size": 7,
-    "origin": {
-      "row": 3,
-      "col": 3
-    },
     "squares": [
       {
         "row": 0,
@@ -172,11 +142,6 @@
         "col": 6
       }
     ],
-    "minDistance": 0,
-    "maxDistance": null,
-    "canJump": false,
-    "blockedByFriendly": true,
-    "blockedByEnemy": true,
     "intermediateMustBeEmpty": true,
     "directions": [
       "orthogonal",
@@ -362,5 +327,6 @@
   "versionTenths": 1,
   "currentVersion": "0.1",
   "createdAt": "2026-10-22T14:24:25.046Z",
-  "updatedAt": "2026-10-22T14:24:25.058Z"
+  "updatedAt": "2026-10-22T14:24:25.058Z",
+  "allegianceId": ""
 }

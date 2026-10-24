@@ -14,21 +14,21 @@
   {
     "id": "tag-damage",
     "type": "tag",
-    "name": "damage",
+    "name": "Damage",
     "color": "damage",
     "order": 1
   },
   {
     "id": "tag-movement",
     "type": "tag",
-    "name": "movement",
+    "name": "Movement",
     "color": "movement",
     "order": 2
   },
   {
     "id": "tag-control",
     "type": "tag",
-    "name": "control",
+    "name": "Control",
     "color": "control",
     "order": 3
   },
@@ -100,7 +100,7 @@
   {
     "id": "state-in-development",
     "type": "productionState",
-    "name": "In Development",
+    "name": "In development",
     "order": 6
   },
   {

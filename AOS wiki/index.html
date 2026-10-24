@@ -25,8 +25,10 @@
 <a class="skip" href="#view">Skip to content</a>
 
 <header class="nav">
+  <a class="studio-link" href="../index.html" title="Pine Fig studio site">
+    <img src="../pinefig%20logo.png" alt="Pine Fig studio">
+  </a>
   <a class="brand" href="#/">
-    <img src="../pinefig%20logo.png" alt="">
     <span>
       <span class="name">Allure of the Supernal</span>
       <span class="sub">Design codex</span>
@@ -36,6 +38,7 @@
     <a href="#/" data-nav="home">Directory</a>
     <a href="#/create" data-nav="create">Create New Hero</a>
     <a href="#/taxonomy" data-nav="taxonomy">Tags</a>
+    <a href="#/setup" data-nav="setup">Setup</a>
     <span class="soon" title="Held until this layout is approved">Systems</span>
   </nav>
   <div class="nav-actions">
@@ -51,7 +54,12 @@
   </form>
 </header>
 
-<main id="view"></main>
+<main id="view" aria-busy="true">
+  <div class="loading-state" role="status">
+    <span class="loading-mark" aria-hidden="true"></span>
+    <span>Opening the codex…</span>
+  </div>
+</main>
 
 <template id="tpl-hero">
   <div class="wrap">
@@ -116,7 +124,7 @@
 
 <footer class="site">
   <span>Private design encyclopedia. Heroes, history, and images are files in the data folder on this PC.</span>
-  <span>Pine Fig · private codex</span>
+  <span><a href="../index.html">Pine Fig</a> · private codex</span>
 </footer>
 
 <div id="modal-root"></div>
@@ -137,6 +145,7 @@
 <script src="js/home.js"></script>
 <script src="js/history-view.js"></script>
 <script src="js/taxonomy.js"></script>
+<script src="js/setup-page.js"></script>
 <script src="js/editor.js"></script>
 <script src="js/router.js"></script>
 <script src="js/app.js"></script>

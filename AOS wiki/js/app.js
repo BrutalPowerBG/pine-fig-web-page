@@ -12,6 +12,7 @@
     } catch (err) {
       console.error(err);
       if (view) {
+        view.removeAttribute("aria-busy");
         view.innerHTML = '<section class="page-block wrap"><div class="empty-state"><h2>Could not open the design files</h2><p>' +
           Codex.schema.escapeHtml(err.message || "The data folder is unavailable.") +
           "</p></div></section>";

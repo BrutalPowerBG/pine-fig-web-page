@@ -131,18 +131,30 @@ h1, h2, h3, .display {
       transparent 100%) left top / 100% 1px no-repeat,
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 10' preserveAspectRatio='xMidYMid meet'%3E%3Cpath d='M0 5h58M102 5h58' stroke='%23f0c67a' stroke-opacity='.55' stroke-width='.6'/%3E%3Cpath d='M58 5c6-6 12-6 18 0s12 6 18 0M68 5c3-2 7-2 10 0' fill='none' stroke='%23f0c67a' stroke-opacity='.85' stroke-width='.7'/%3E%3Ccircle cx='80' cy='5' r='1.2' fill='%23f0c67a'/%3E%3C/svg%3E") center 1px / 160px 10px no-repeat;
 }
+/* Studio mark links back to the Pine Fig site; the title beside it is the codex home. */
+.studio-link {
+  display: flex;
+  align-items: center;
+  padding-right: 16px;
+  margin-right: -12px;
+  border-right: 1px solid var(--line-strong);
+  opacity: 0.85;
+  transition: opacity 0.15s ease;
+}
+.studio-link:hover,
+.studio-link:focus-visible { opacity: 1; }
+.studio-link img {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  object-fit: cover;
+}
 .brand {
   display: flex;
   align-items: center;
   gap: 12px;
   text-decoration: none;
   min-width: max-content;
-}
-.brand img {
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
-  object-fit: cover;
 }
 .brand .name {
   font-family: var(--serif);
@@ -241,6 +253,47 @@ h1, h2, h3, .display {
   margin: 0 auto;
 }
 main { position: relative; z-index: 1; }
+
+/* ---------- loading ---------- */
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  min-height: 60vh;
+  color: var(--cream-faint);
+  font-family: var(--serif);
+  font-size: 20px;
+  letter-spacing: 0.04em;
+}
+.loading-mark {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px solid var(--line);
+  border-top-color: var(--gold);
+  animation: codex-spin 0.9s linear infinite;
+}
+/* A page that takes a moment to swap in dims the old one and shows the same mark. */
+#view.is-loading > * { opacity: 0.35; transition: opacity 0.2s ease; pointer-events: none; }
+#view.is-loading::after {
+  content: "";
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  width: 44px;
+  height: 44px;
+  margin: -22px 0 0 -22px;
+  border-radius: 50%;
+  border: 2px solid var(--line);
+  border-top-color: var(--gold);
+  animation: codex-spin 0.9s linear infinite;
+}
+@keyframes codex-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .loading-mark, #view.is-loading::after { animation-duration: 2.4s; }
+}
 
 .kicker {
   display: flex;
@@ -854,6 +907,8 @@ footer.site {
   color: var(--cream-faint);
   font-size: 13px;
 }
+footer.site a { color: var(--cream-dim); text-underline-offset: 3px; }
+footer.site a:hover { color: var(--gold); }
 
 @media (max-width: 980px) {
   .profile-row, .dossier, .ability-card, .detail-grid, .related, .ability-dock { grid-template-columns: 1fr; justify-content: stretch; }
@@ -867,10 +922,19 @@ footer.site {
   .ability-dock { overflow-x: visible; }
   .nav { height: auto; flex-wrap: wrap; padding: 14px 18px; gap: 12px; }
   .search { width: 100%; margin-left: 0; }
+  .studio-link { margin-right: 0; padding-right: 12px; }
   .wrap { width: min(1180px, calc(100% - 36px)); }
 }
 @media (max-width: 640px) {
-  .nav-links { display: none; }
+  /* Keep Directory / Create / Tags reachable on phones: own row, scrolls sideways if needed. */
+  .nav-links { order: 3; width: 100%; gap: 18px; overflow-x: auto; white-space: nowrap; }
+  .nav-links a, .nav-links span { font-size: 15px; }
+  /* Three stacked rows are too tall to pin on a phone; the header scrolls away with the page. */
+  .nav { position: static; padding: 12px 16px; gap: 10px 12px; }
+  .nav-actions { margin-left: auto; }
+  .brand .name { font-size: 17px; }
+  .brand .sub { font-size: 10px; }
+  .section-head h2 { font-size: 32px; }
   .hero h1 { font-size: 64px; }
 }
 @media (prefers-reduced-motion: reduce) {

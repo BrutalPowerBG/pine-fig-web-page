@@ -4,6 +4,7 @@
     catalog: null,
     taxonomy: null,
     settings: null,
+    setup: null,
     heroes: {}
   };
   const state = { ready: false, writable: false };
@@ -42,6 +43,7 @@
     cache.catalog = null;
     cache.taxonomy = null;
     cache.settings = null;
+    cache.setup = null;
     cache.heroes = {};
   }
 
@@ -116,6 +118,7 @@
         throw new Error("The design files in the data folder could not be read.");
       }
     }
+    await readSetup();
     state.ready = true;
   }
 
@@ -160,6 +163,26 @@
     return cache.settings;
   }
 
+  // Shared design setup: movement board, stat names, colour themes. Applied to the schema on read.
+  async function readSetup() {
+    if (cache.setup === null) {
+      const data = await readJson("data/setup.json", null);
+      cache.setup = Codex.schema.applySetup(data);
+      cache.setupStored = !!data;
+    }
+    return Codex.schema.clone(cache.setup);
+  }
+
+  function hasStoredSetup() { return !!cache.setupStored; }
+
+  async function writeSetup(raw) {
+    const clean = Codex.schema.normalizeSetup(raw);
+    await commit({ files: [{ path: "data/setup.json", json: clean }] });
+    cache.setup = Codex.schema.applySetup(clean);
+    cache.setupStored = true;
+    return Codex.schema.clone(clean);
+  }
+
   async function getMeta(key) {
     const settings = await readSettings();
     if (!Object.prototype.hasOwnProperty.call(settings, key)) return undefined;
@@ -185,10 +208,11 @@
       epithet: hero.epithet || "",
       productionStateId: hero.productionStateId || "",
       tierId: hero.tierId || "",
+      allegianceId: hero.allegianceId || "",
       roleIds: (hero.roleIds || []).slice(),
       tagIds: (hero.tagIds || []).slice(),
       stats: (hero.stats || []).map(function (stat) {
-        return { id: stat.id, code: stat.code, value: stat.value };
+        return { id: stat.id, value: stat.value };
       }),
       artwork: imageRef(hero.artwork),
       updatedAt: hero.updatedAt || "",
@@ -244,6 +268,7 @@
     const used = heroes.some(function (hero) {
       return hero.productionStateId === id
         || hero.tierId === id
+        || hero.allegianceId === id
         || (hero.roleIds || []).indexOf(id) !== -1
         || (hero.tagIds || []).indexOf(id) !== -1
         || (hero.abilities || []).some(function (ability) { return (ability.tagIds || []).indexOf(id) !== -1; });
@@ -405,7 +430,7 @@
   }
 
   async function exportBackup() {
-    const [heroes, taxonomy] = await Promise.all([loadDossiers(), listTaxonomy()]);
+    const [heroes, taxonomy, setup] = await Promise.all([loadDossiers(), listTaxonomy(), readSetup()]);
     const historyIndex = [];
     const historySnapshots = [];
     for (let i = 0; i < heroes.length; i += 1) {
@@ -444,6 +469,7 @@
       historyIndex: historyIndex,
       historySnapshots: historySnapshots,
       taxonomy: taxonomy,
+      setup: setup,
       images: images
     };
   }
@@ -469,6 +495,7 @@
     });
     const files = [
       { path: "data/taxonomy.json", json: payload.taxonomy || [] },
+      { path: "data/setup.json", json: Codex.schema.normalizeSetup(payload.setup) },
       { path: "data/catalog.json", json: heroes.map(toCard).sort(function (a, b) { return String(a.name).localeCompare(String(b.name)); }) }
     ];
     heroes.forEach(function (hero) {
@@ -619,6 +646,9 @@
     writeHero: writeHero,
     deleteHero: deleteHero,
     listTaxonomy: listTaxonomy,
+    readSetup: readSetup,
+    writeSetup: writeSetup,
+    hasStoredSetup: hasStoredSetup,
     writeTaxonomy: writeTaxonomy,
     saveTaxonomyItem: saveTaxonomyItem,
     deleteTaxonomyItem: deleteTaxonomyItem,

@@ -2,7 +2,7 @@
   const Codex = window.Codex = window.Codex || {};
 
   async function createItem(type, name) {
-    const label = String(name || "").trim();
+    const label = Codex.schema.labelCase(name);
     if (!label) throw new Error("Enter a name.");
     const tax = await Codex.store.listTaxonomy();
     const existing = tax.find(function (item) {
@@ -53,6 +53,7 @@
       ["role", "Roles"],
       ["tag", "Tags"],
       ["tier", "Hero tiers"],
+      ["allegiance", "Allegiances"],
       ["productionState", "Production states"]
     ];
     mount.innerHTML =
@@ -65,7 +66,7 @@
           return '<div class="tax-block"><div class="section-head tight"><h2>' + esc(pair[1]) + '</h2><button type="button" class="btn" data-add-tax="' + pair[0] + '">Add</button></div>' +
             '<ul class="tax-list">' + items.map(function (item) {
               const used = heroes.filter(function (hero) {
-                return hero.productionStateId === item.id || hero.tierId === item.id
+                return hero.productionStateId === item.id || hero.tierId === item.id || hero.allegianceId === item.id
                   || (hero.roleIds || []).indexOf(item.id) !== -1
                   || (hero.tagIds || []).indexOf(item.id) !== -1
                   || (hero.abilities || []).some(function (ab) { return (ab.tagIds || []).indexOf(item.id) !== -1; });
@@ -92,7 +93,7 @@
           '<div class="modal-actions"><button type="button" class="btn ghost" data-dismiss>Cancel</button><button type="button" class="btn primary" data-save-tax>Save</button></div>'
         );
         box.el.querySelector("[data-save-tax]").addEventListener("click", async function () {
-          const name = box.el.querySelector("[data-tax-name]").value.trim();
+          const name = Codex.schema.labelCase(box.el.querySelector("[data-tax-name]").value);
           if (!name) return Codex.ui.toast("Enter a name.", "err");
           item.name = name;
           await Codex.store.saveTaxonomyItem(item);

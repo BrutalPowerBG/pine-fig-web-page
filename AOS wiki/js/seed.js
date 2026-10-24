@@ -12,6 +12,7 @@
     const seeded = await Codex.store.getMeta("seeded");
     const tax = await Codex.store.listTaxonomy();
     if (!tax.length) await Codex.store.writeTaxonomy(Codex.schema.DEFAULT_TAXONOMY);
+    if (!Codex.store.hasStoredSetup()) await Codex.store.writeSetup(await Codex.store.readSetup());
     const seedVer = seeded && seeded.value && (typeof seeded.value === "object" ? seeded.value.version : (seeded.value === true ? 1 : seeded.value));
     if (seedVer >= SEED_VERSION) return;
     const existingSample = await Codex.store.getHero("sample-hero-01");
@@ -27,10 +28,6 @@
           touched = true;
         }
       });
-      if (existingSample.movement && existingSample.movement.size !== 7) {
-        existingSample.movement.size = 7;
-        touched = true;
-      }
       if (touched) {
         existingSample.updatedAt = new Date().toISOString();
         await Codex.store.writeHero(existingSample);
@@ -46,11 +43,11 @@
     }
 
     const src = sample.hero;
-    const pattern = Codex.schema.queenPattern((src.movement && src.movement.size) || 7);
+    const pattern = Codex.schema.queenPattern(Codex.schema.board().size);
     const flatStats = {};
     (src.stats || []).forEach(function (row) {
       (Array.isArray(row) ? row : [row]).forEach(function (stat) {
-        flatStats[stat.code] = stat.value;
+        flatStats[stat.id] = stat.value;
       });
     });
 
@@ -67,15 +64,8 @@
       roleIds: (src.roles || []).map(roleId),
       tagIds: [],
       artwork: { kind: "path", value: src.artwork && src.artwork.src },
-      theme: src.theme,
       stats: Codex.schema.defaultStats(flatStats),
-      movement: Object.assign(Codex.schema.defaultMovement(src.movement.size), {
-        label: src.movement.label,
-        note: src.movement.note,
-        size: src.movement.size,
-        origin: pattern.origin,
-        squares: pattern.squares
-      }),
+      movement: Object.assign(Codex.schema.defaultMovement(), { squares: pattern.squares }),
       abilities: (sample.abilities || []).map(function (ability, index) {
         return Codex.schema.normalizeAbility({
           id: ability.id,

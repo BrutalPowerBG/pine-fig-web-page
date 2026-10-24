@@ -9,7 +9,7 @@
     const taxMap = Codex.schema.taxMap(tax);
     const roles = (hero.roleIds || []).map(function (id) { return taxMap[id] && taxMap[id].name; });
     const tags = (hero.tagIds || []).map(function (id) { return taxMap[id] && taxMap[id].name; });
-    const stats = (hero.stats || []).map(function (s) { return s.code + " " + s.name + " " + s.value; });
+    const stats = (hero.stats || []).map(function (s) { return s.id + " " + Codex.schema.statName(s.id) + " " + s.value; });
     const abilities = (hero.abilities || []).map(function (ab) {
       const abilityTags = (ab.tagIds || []).map(function (id) { return taxMap[id] && taxMap[id].name; }).join(" ");
       return [ab.name, ab.summary, ab.lore, ab.kind, ab.cooldown, ab.cost, ab.range, abilityTags, (ab.effects || []).join(" "), (ab.upgrades || []).join(" "), (ab.interactions || []).join(" ")].join(" ");
@@ -21,8 +21,6 @@
       Codex.schema.taxName(tax, hero.tierId, ""),
       roles.join(" "), tags.join(" "),
       (hero.lore || []).join(" "),
-      hero.movement && hero.movement.note,
-      hero.movement && hero.movement.label,
       stats.join(" "),
       abilities.join(" "),
       related.join(" ")

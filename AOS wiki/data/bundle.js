@@ -14,32 +14,26 @@ window.CodexFiles = {
       "stats": [
         {
           "id": "HP",
-          "code": "HP",
           "value": "120"
         },
         {
           "id": "HPR",
-          "code": "HPR",
           "value": "4"
         },
         {
           "id": "AD",
-          "code": "AD",
           "value": "18"
         },
         {
           "id": "ATR",
-          "code": "ATR",
           "value": "2"
         },
         {
           "id": "ARM",
-          "code": "ARM",
           "value": "12"
         },
         {
           "id": "CRIT",
-          "code": "CRIT",
           "value": "8%"
         }
       ],
@@ -107,7 +101,8 @@ window.CodexFiles = {
           "note": "Sample battlefield name used only to show a cross-link.",
           "type": "Map"
         }
-      ]
+      ],
+      "allegianceId": ""
     }
   ],
   "data/heroes/sample-hero-01.json": {
@@ -129,63 +124,33 @@ window.CodexFiles = {
       "kind": "path",
       "value": "images/heroes/sample-hero-01.jpg"
     },
-    "theme": {
-      "accent": "#f0c67a",
-      "accent2": "#ff7340",
-      "glow": "rgba(240, 198, 122, 0.45)"
-    },
     "stats": [
       {
         "id": "HP",
-        "code": "HP",
-        "name": "Health",
-        "description": "Hit points.",
         "value": "120"
       },
       {
         "id": "HPR",
-        "code": "HPR",
-        "name": "Regen",
-        "description": "Health recovered each turn.",
         "value": "4"
       },
       {
         "id": "AD",
-        "code": "AD",
-        "name": "Attack",
-        "description": "Base attack damage.",
         "value": "18"
       },
       {
         "id": "ATR",
-        "code": "ATR",
-        "name": "Range",
-        "description": "Attack reach in tiles.",
         "value": "2"
       },
       {
         "id": "ARM",
-        "code": "ARM",
-        "name": "Armor",
-        "description": "Incoming damage reduction.",
         "value": "12"
       },
       {
         "id": "CRIT",
-        "code": "CRIT",
-        "name": "Crit",
-        "description": "Chance to deal a critical hit.",
         "value": "8%"
       }
     ],
     "movement": {
-      "label": "Movement",
-      "note": "Squares marked + can be reached in one turn.",
-      "size": 7,
-      "origin": {
-        "row": 3,
-        "col": 3
-      },
       "squares": [
         {
           "row": 0,
@@ -284,11 +249,6 @@ window.CodexFiles = {
           "col": 6
         }
       ],
-      "minDistance": 0,
-      "maxDistance": null,
-      "canJump": false,
-      "blockedByFriendly": true,
-      "blockedByEnemy": true,
       "intermediateMustBeEmpty": true,
       "directions": [
         "orthogonal",
@@ -474,7 +434,8 @@ window.CodexFiles = {
     "versionTenths": 1,
     "currentVersion": "0.1",
     "createdAt": "2026-10-22T14:24:25.046Z",
-    "updatedAt": "2026-10-22T14:24:25.058Z"
+    "updatedAt": "2026-10-22T14:24:25.058Z",
+    "allegianceId": ""
   },
   "data/history/sample-hero-01.json": [
     {
@@ -521,63 +482,33 @@ window.CodexFiles = {
         "kind": "path",
         "value": "images/heroes/sample-hero-01.jpg"
       },
-      "theme": {
-        "accent": "#f0c67a",
-        "accent2": "#ff7340",
-        "glow": "rgba(240, 198, 122, 0.45)"
-      },
       "stats": [
         {
           "id": "HP",
-          "code": "HP",
-          "name": "Health",
-          "description": "Hit points.",
           "value": "120"
         },
         {
           "id": "HPR",
-          "code": "HPR",
-          "name": "Regen",
-          "description": "Health recovered each turn.",
           "value": "4"
         },
         {
           "id": "AD",
-          "code": "AD",
-          "name": "Attack",
-          "description": "Base attack damage.",
           "value": "18"
         },
         {
           "id": "ATR",
-          "code": "ATR",
-          "name": "Range",
-          "description": "Attack reach in tiles.",
           "value": "2"
         },
         {
           "id": "ARM",
-          "code": "ARM",
-          "name": "Armor",
-          "description": "Incoming damage reduction.",
           "value": "12"
         },
         {
           "id": "CRIT",
-          "code": "CRIT",
-          "name": "Crit",
-          "description": "Chance to deal a critical hit.",
           "value": "8%"
         }
       ],
       "movement": {
-        "label": "Movement",
-        "note": "Squares marked + can be reached in one turn.",
-        "size": 7,
-        "origin": {
-          "row": 3,
-          "col": 3
-        },
         "squares": [
           {
             "row": 0,
@@ -676,11 +607,6 @@ window.CodexFiles = {
             "col": 6
           }
         ],
-        "minDistance": 0,
-        "maxDistance": null,
-        "canJump": false,
-        "blockedByFriendly": true,
-        "blockedByEnemy": true,
         "intermediateMustBeEmpty": true,
         "directions": [
           "orthogonal",
@@ -866,13 +792,72 @@ window.CodexFiles = {
       "versionTenths": 1,
       "currentVersion": "0.1",
       "createdAt": "2026-10-22T14:24:25.046Z",
-      "updatedAt": "2026-10-22T14:24:25.058Z"
+      "updatedAt": "2026-10-22T14:24:25.058Z",
+      "allegianceId": ""
     }
   },
   "data/settings.json": {
     "seeded": {
       "version": 2
     }
+  },
+  "data/setup.json": {
+    "board": {
+      "label": "Movement",
+      "note": "Squares marked + can be reached in one turn.",
+      "size": 7,
+      "origin": {
+        "row": 3,
+        "col": 3
+      }
+    },
+    "stats": [
+      {
+        "id": "HP",
+        "name": "Health",
+        "description": "Hit points.",
+        "defaultValue": "0"
+      },
+      {
+        "id": "HPR",
+        "name": "Regen",
+        "description": "Health recovered each turn.",
+        "defaultValue": "0"
+      },
+      {
+        "id": "AD",
+        "name": "Attack",
+        "description": "Base attack damage.",
+        "defaultValue": "0"
+      },
+      {
+        "id": "ATR",
+        "name": "Range",
+        "description": "Attack reach in tiles.",
+        "defaultValue": "0"
+      },
+      {
+        "id": "ARM",
+        "name": "Armor",
+        "description": "Incoming damage reduction.",
+        "defaultValue": "0"
+      },
+      {
+        "id": "CRIT",
+        "name": "Crit",
+        "description": "Chance to deal a critical hit.",
+        "defaultValue": "0%"
+      }
+    ],
+    "themes": [
+      {
+        "id": "theme-default",
+        "name": "Default",
+        "accent": "#f0c67a",
+        "accent2": "#ff7340",
+        "match": {}
+      }
+    ]
   },
   "data/taxonomy.json": [
     {
@@ -890,21 +875,21 @@ window.CodexFiles = {
     {
       "id": "tag-damage",
       "type": "tag",
-      "name": "damage",
+      "name": "Damage",
       "color": "damage",
       "order": 1
     },
     {
       "id": "tag-movement",
       "type": "tag",
-      "name": "movement",
+      "name": "Movement",
       "color": "movement",
       "order": 2
     },
     {
       "id": "tag-control",
       "type": "tag",
-      "name": "control",
+      "name": "Control",
       "color": "control",
       "order": 3
     },
@@ -976,7 +961,7 @@ window.CodexFiles = {
     {
       "id": "state-in-development",
       "type": "productionState",
-      "name": "In Development",
+      "name": "In development",
       "order": 6
     },
     {

@@ -277,6 +277,19 @@
     text-decoration: underline;
     text-underline-offset: 3px;
   }
+  .text-cta{
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 22px;
+    font-weight: 500;
+    font-size: 15.5px;
+    text-decoration: none;
+    border-bottom: 2px solid var(--flesh);
+    padding-bottom: 2px;
+  }
+  .text-cta span{ transition: transform 0.15s ease; }
+  .text-cta:hover span{ transform: translateX(3px); }
 
   /* ---------- about ---------- */
   .about{
@@ -460,6 +473,7 @@
         <h3>Allure of the Supernal</h3>
         <p class="hook">A chess-like battlefield where every unit has a stat sheet and a reason to fight.</p>
         <p class="desc">Turn-based tactics on a board that rewards positioning as much as power. Units carry their own stats and special abilities, so no two engagements play out the same way.</p>
+        <a class="text-cta" href="AOS%20wiki/index.html">Browse the hero codex <span aria-hidden="true">→</span></a>
       </div>
     </div>
   </div>
@@ -496,6 +510,10 @@
         <strong>Word Puzzle Tetromino</strong>
         <a href="word-puzzle-tetromino-privacy.html">Privacy Policy</a>
         <a href="word-puzzle-tetromino-delete-account.html">Delete profile</a>
+      </div>
+      <div class="col">
+        <strong>Allure of the Supernal</strong>
+        <a href="AOS%20wiki/index.html">Hero codex</a>
       </div>
     </nav>
     <span>Sofia, Bulgaria</span>

@@ -85,19 +85,19 @@
         nextImage: next.artwork
       }));
     }
-    if (!same(prev.theme, next.theme)) {
-      info.push(change("theme", JSON.stringify(prev.theme), JSON.stringify(next.theme)));
+    if ((prev.allegianceId || "") !== (next.allegianceId || "")) {
+      info.push(change("allegiance", Codex.schema.taxName(tax, prev.allegianceId, "None"), Codex.schema.taxName(tax, next.allegianceId, "None")));
     }
     if (info.length) {
       groups.push({ type: "heroInfo", title: "Hero Information Changed", changes: info });
     }
 
     const statChanges = [];
-    Codex.schema.STAT_DEFS.forEach(function (def) {
+    Codex.schema.statDefs().forEach(function (def) {
       const a = prev.stats.find(function (s) { return s.id === def.id; }) || {};
       const b = next.stats.find(function (s) { return s.id === def.id; }) || {};
-      if (a.value !== b.value || a.name !== b.name) {
-        statChanges.push(change(def.name, a.value, b.value, { code: def.code, prevName: a.name, nextName: b.name }));
+      if (a.value !== b.value) {
+        statChanges.push(change(def.name, a.value, b.value, { statId: def.id }));
       }
     });
     if (statChanges.length) {
@@ -107,10 +107,9 @@
     const moveChanges = [];
     const pm = prev.movement;
     const nm = next.movement;
-    ["note", "canJump", "blockedByFriendly", "blockedByEnemy", "intermediateMustBeEmpty"].forEach(function (field) {
-      if (!same(pm[field], nm[field])) moveChanges.push(change(field, pm[field], nm[field]));
-    });
-    if (!same(pm.origin, nm.origin)) moveChanges.push(change("origin", labelOf(pm.origin), labelOf(nm.origin)));
+    if (!same(pm.intermediateMustBeEmpty, nm.intermediateMustBeEmpty)) {
+      moveChanges.push(change("intermediateMustBeEmpty", pm.intermediateMustBeEmpty, nm.intermediateMustBeEmpty));
+    }
     if (!same(pm.directions, nm.directions)) moveChanges.push(change("directions", (pm.directions || []).join(", "), (nm.directions || []).join(", ")));
     if (!same(pm.conditions, nm.conditions)) moveChanges.push(change("conditions", (pm.conditions || []).join("; "), (nm.conditions || []).join("; ")));
     const prevSet = squareSet(pm.squares);

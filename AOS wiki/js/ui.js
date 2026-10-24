@@ -188,7 +188,15 @@
     }
   }
 
+  function applyTheme(theme) {
+    const root = document.documentElement.style;
+    root.setProperty("--accent", theme.accent);
+    root.setProperty("--accent-2", theme.accent2);
+    root.setProperty("--glow", Codex.schema.glowFor(theme.accent));
+  }
+
   Codex.ui = {
+    applyTheme: applyTheme,
     qs: qs,
     toast: toast,
     modal: modal,

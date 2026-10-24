@@ -45,7 +45,8 @@
     const cIdx = codeIdx !== -1 ? codeIdx : 0;
     const vIdx = valueIdx !== -1 ? valueIdx : 1;
     const known = {};
-    Codex.schema.STAT_DEFS.forEach(function (def) { known[def.id] = def; known[def.code] = def; });
+    // Rows may name a stat by its id ("HP") or its display name ("Health").
+    Codex.schema.statDefs().forEach(function (def) { known[def.id.toUpperCase()] = def; known[def.name.toUpperCase()] = def; });
     const seen = {};
     const mappings = [];
     const warnings = [];
@@ -69,13 +70,12 @@
       const current = (hero.stats || []).find(function (stat) { return stat.id === def.id; });
       mappings.push({
         id: def.id,
-        code: def.code,
         name: def.name,
         current: current ? current.value : "",
         next: value
       });
     });
-    Codex.schema.STAT_DEFS.forEach(function (def) {
+    Codex.schema.statDefs().forEach(function (def) {
       if (!seen[def.id]) warnings.push("Missing " + def.id + " in the file. The current value will be kept.");
     });
     return { ok: errors.length === 0 && mappings.length > 0, errors: errors, warnings: warnings, mappings: mappings };

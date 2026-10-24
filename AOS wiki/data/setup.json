@@ -1,0 +1,58 @@
+{
+  "board": {
+    "label": "Movement",
+    "note": "Squares marked + can be reached in one turn.",
+    "size": 7,
+    "origin": {
+      "row": 3,
+      "col": 3
+    }
+  },
+  "stats": [
+    {
+      "id": "HP",
+      "name": "Health",
+      "description": "Hit points.",
+      "defaultValue": "0"
+    },
+    {
+      "id": "HPR",
+      "name": "Regen",
+      "description": "Health recovered each turn.",
+      "defaultValue": "0"
+    },
+    {
+      "id": "AD",
+      "name": "Attack",
+      "description": "Base attack damage.",
+      "defaultValue": "0"
+    },
+    {
+      "id": "ATR",
+      "name": "Range",
+      "description": "Attack reach in tiles.",
+      "defaultValue": "0"
+    },
+    {
+      "id": "ARM",
+      "name": "Armor",
+      "description": "Incoming damage reduction.",
+      "defaultValue": "0"
+    },
+    {
+      "id": "CRIT",
+      "name": "Crit",
+      "description": "Chance to deal a critical hit.",
+      "defaultValue": "0%"
+    }
+  ],
+  "themes": [
+    {
+      "id": "theme-default",
+      "name": "Default",
+      "accent": "#f0c67a",
+      "accent2": "#ff7340",
+      "match": {}
+    }
+  ]
+}

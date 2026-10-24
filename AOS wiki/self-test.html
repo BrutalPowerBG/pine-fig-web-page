@@ -37,6 +37,19 @@
     check("queen movement squares", sample && sample.movement.squares.length > 10);
     check("artwork path", sample && sample.artwork.value && sample.artwork.value.indexOf("sample-hero-01.jpg") !== -1);
     check("version present", sample && sample.versionTenths >= 1);
+    check("stats store only id and value", sample && Object.keys(sample.stats[0]).join(",") === "id,value");
+    check("board and theme are not on the hero", sample && !("theme" in sample) && !("size" in sample.movement) && !("note" in sample.movement));
+
+    const savedSetup = Codex.schema.clone(Codex.schema.getSetup());
+    Codex.schema.applySetup(Object.assign({}, savedSetup, { themes: [
+      { id: "t-default", name: "Default", accent: "#111111", accent2: "#222222", match: {} },
+      { id: "t-tier", name: "Tier", accent: "#333333", accent2: "#444444", match: { tierId: "tier-3" } },
+      { id: "t-tier-role", name: "Tier and role", accent: "#555555", accent2: "#666666", match: { tierId: "tier-3", roleId: "role-vanguard" } }
+    ] }));
+    check("theme with most matching conditions wins", Codex.schema.themeFor({ tierId: "tier-3", roleIds: ["role-vanguard"] }).id === "t-tier-role");
+    check("partial theme match falls back to fewer conditions", Codex.schema.themeFor({ tierId: "tier-3", roleIds: [] }).id === "t-tier");
+    check("no match uses default theme", Codex.schema.themeFor({ tierId: "tier-1", roleIds: [] }).id === "t-default");
+    Codex.schema.applySetup(savedSetup);
 
     const csvTarget = Codex.schema.clone(sample);
     const originalHp = csvTarget.stats[0].value;

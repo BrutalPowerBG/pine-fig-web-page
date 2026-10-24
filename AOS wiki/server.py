@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Local codex server.
 
-Serves the wiki and writes design files under data/.
+Serves the whole Pine Fig site (so the wiki and the studio page can link
+to each other) and writes design files under data/.
 A browser page cannot save into this folder by itself, so Save Draft
 posts here. Bind is localhost only.
 
@@ -11,19 +12,21 @@ posts here. Bind is localhost only.
 from __future__ import annotations
 
 import base64
+import functools
 import json
 import os
 import re
 import sys
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
-from urllib.parse import urlsplit
+from urllib.parse import quote, urlsplit
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
+SITE = os.path.dirname(ROOT)
 DATA = os.path.join(ROOT, "data")
 MAX_BODY = 40 * 1024 * 1024
 
 ALLOWED = re.compile(
-    r"^data/(catalog|taxonomy|settings)\.json$"
+    r"^data/(catalog|taxonomy|settings|setup)\.json$"
     r"|^data/heroes/[A-Za-z0-9][A-Za-z0-9_-]{0,80}\.json$"
     r"|^data/history/[A-Za-z0-9][A-Za-z0-9_-]{0,80}\.json$"
     r"|^data/history/[A-Za-z0-9][A-Za-z0-9_-]{0,80}/[0-9]+\.json$"
@@ -177,10 +180,12 @@ def write_bundle() -> None:
 
 def main() -> None:
     port = int(sys.argv[1]) if len(sys.argv) > 1 else 8765
-    os.chdir(ROOT)
     write_bundle()
-    server = ThreadingHTTPServer(("127.0.0.1", port), CodexHandler)
-    print("Codex server at http://127.0.0.1:%s/" % port, flush=True)
+    handler = functools.partial(CodexHandler, directory=SITE)
+    server = ThreadingHTTPServer(("127.0.0.1", port), handler)
+    wiki = quote(os.path.basename(ROOT))
+    print("Codex server at http://127.0.0.1:%s/%s/" % (port, wiki), flush=True)
+    print("Studio page at http://127.0.0.1:%s/" % port, flush=True)
     print("Design files are written under %s" % DATA, flush=True)
     try:
         server.serve_forever()

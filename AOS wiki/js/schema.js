@@ -1,20 +1,32 @@
 (function () {
   const Codex = window.Codex = window.Codex || {};
 
-  const STAT_DEFS = [
-    { id: "HP", code: "HP", name: "Health", description: "Hit points." },
-    { id: "HPR", code: "HPR", name: "Regen", description: "Health recovered each turn." },
-    { id: "AD", code: "AD", name: "Attack", description: "Base attack damage." },
-    { id: "ATR", code: "ATR", name: "Range", description: "Attack reach in tiles." },
-    { id: "ARM", code: "ARM", name: "Armor", description: "Incoming damage reduction." },
-    { id: "CRIT", code: "CRIT", name: "Crit", description: "Chance to deal a critical hit." }
-  ];
-
-  const DEFAULT_THEME = {
-    accent: "#f0c67a",
-    accent2: "#ff7340",
-    glow: "rgba(240, 198, 122, 0.45)"
+  // Shared design setup (data/setup.json). Heroes only store ids and values;
+  // names, the movement board and colour themes are defined once here and edited on the Setup page.
+  const DEFAULT_SETUP = {
+    board: {
+      label: "Movement",
+      note: "Squares marked + can be reached in one turn.",
+      size: 7,
+      origin: { row: 3, col: 3 }
+    },
+    stats: [
+      { id: "HP", name: "Health", description: "Hit points.", defaultValue: "0" },
+      { id: "HPR", name: "Regen", description: "Health recovered each turn.", defaultValue: "0" },
+      { id: "AD", name: "Attack", description: "Base attack damage.", defaultValue: "0" },
+      { id: "ATR", name: "Range", description: "Attack reach in tiles.", defaultValue: "0" },
+      { id: "ARM", name: "Armor", description: "Incoming damage reduction.", defaultValue: "0" },
+      { id: "CRIT", name: "Crit", description: "Chance to deal a critical hit.", defaultValue: "0%" }
+    ],
+    // The first theme with no conditions is the default. Others apply when every condition they set
+    // matches the hero; the one with the most conditions wins, ties go to the earlier theme.
+    themes: [
+      { id: "theme-default", name: "Default", accent: "#f0c67a", accent2: "#ff7340", match: {} }
+    ]
   };
+  const THEME_MATCH_KEYS = ["tierId", "roleId", "allegianceId"];
+
+  let setup = clone(DEFAULT_SETUP);
 
   const ABILITY_ICONS = {
     a1: '<svg viewBox="0 0 64 64" fill="none" aria-hidden="true"><circle cx="32" cy="32" r="18" stroke="#f0c67a" stroke-width="2.4"/><circle cx="32" cy="32" r="6" fill="#ff7340"/><path d="M32 8v8M32 48v8M8 32h8M48 32h8" stroke="#f6f0e6" stroke-width="2" stroke-linecap="round"/></svg>',
@@ -27,9 +39,9 @@
   const DEFAULT_TAXONOMY = [
     { id: "role-vanguard", type: "role", name: "Vanguard", order: 1 },
     { id: "role-controller", type: "role", name: "Controller", order: 2 },
-    { id: "tag-damage", type: "tag", name: "damage", color: "damage", order: 1 },
-    { id: "tag-movement", type: "tag", name: "movement", color: "movement", order: 2 },
-    { id: "tag-control", type: "tag", name: "control", color: "control", order: 3 },
+    { id: "tag-damage", type: "tag", name: "Damage", color: "damage", order: 1 },
+    { id: "tag-movement", type: "tag", name: "Movement", color: "movement", order: 2 },
+    { id: "tag-control", type: "tag", name: "Control", color: "control", order: 3 },
     { id: "tier-1", type: "tier", name: "I", value: 1, order: 1 },
     { id: "tier-2", type: "tier", name: "II", value: 2, order: 2 },
     { id: "tier-3", type: "tier", name: "III", value: 3, order: 3 },
@@ -40,7 +52,7 @@
     { id: "state-concept", type: "productionState", name: "Concept", order: 3 },
     { id: "state-design", type: "productionState", name: "Design", order: 4 },
     { id: "state-prototype", type: "productionState", name: "Prototype", order: 5 },
-    { id: "state-in-development", type: "productionState", name: "In Development", order: 6 },
+    { id: "state-in-development", type: "productionState", name: "In development", order: 6 },
     { id: "state-playtesting", type: "productionState", name: "Playtesting", order: 7 },
     { id: "state-approved", type: "productionState", name: "Approved", order: 8 },
     { id: "state-deprecated", type: "productionState", name: "Deprecated", order: 9 }
@@ -50,6 +62,12 @@
     const rand = Math.random().toString(36).slice(2, 8);
     const time = Date.now().toString(36);
     return (prefix ? prefix + "-" : "") + time + rand;
+  }
+
+  // Taxonomy labels are sentence case: first letter capitalised, the rest kept (so "AoE" survives).
+  function labelCase(text) {
+    const label = String(text || "").trim();
+    return label.charAt(0).toUpperCase() + label.slice(1);
   }
 
   function slugify(text) {
@@ -63,6 +81,99 @@
 
   function clone(value) {
     return JSON.parse(JSON.stringify(value));
+  }
+
+  // ---------- setup ----------
+
+  function clampBoardSize(size) {
+    return Math.min(15, Math.max(3, Math.round(Number(size) || 7)));
+  }
+
+  function normalizeSetup(raw) {
+    const src = raw && typeof raw === "object" ? raw : {};
+    const board = Object.assign(clone(DEFAULT_SETUP.board), src.board || {});
+    board.size = clampBoardSize(board.size);
+    const center = Math.floor(board.size / 2);
+    const origin = board.origin || {};
+    board.origin = {
+      row: Number(origin.row) >= 0 && Number(origin.row) < board.size ? Number(origin.row) : center,
+      col: Number(origin.col) >= 0 && Number(origin.col) < board.size ? Number(origin.col) : center
+    };
+    const stats = (Array.isArray(src.stats) && src.stats.length ? src.stats : DEFAULT_SETUP.stats)
+      .filter(function (stat) { return stat && stat.id; })
+      .map(function (stat) {
+        return {
+          id: String(stat.id),
+          name: stat.name || String(stat.id),
+          description: stat.description || "",
+          defaultValue: stat.defaultValue != null ? String(stat.defaultValue) : "0"
+        };
+      });
+    const themes = (Array.isArray(src.themes) && src.themes.length ? src.themes : DEFAULT_SETUP.themes)
+      .map(function (theme, index) {
+        const match = {};
+        THEME_MATCH_KEYS.forEach(function (key) {
+          if (theme.match && theme.match[key]) match[key] = String(theme.match[key]);
+        });
+        return {
+          id: theme.id || uid("theme"),
+          name: theme.name || "Theme " + (index + 1),
+          accent: theme.accent || DEFAULT_SETUP.themes[0].accent,
+          accent2: theme.accent2 || DEFAULT_SETUP.themes[0].accent2,
+          match: match
+        };
+      });
+    return { board: board, stats: stats, themes: themes };
+  }
+
+  function applySetup(raw) {
+    setup = normalizeSetup(raw);
+    return setup;
+  }
+
+  function getSetup() { return setup; }
+  function statDefs() { return setup.stats; }
+  function board() { return setup.board; }
+
+  function statName(id) {
+    const def = setup.stats.find(function (stat) { return stat.id === id; });
+    return def ? def.name : id;
+  }
+
+  function themeConditionCount(theme) {
+    return Object.keys(theme.match || {}).length;
+  }
+
+  function themeMatches(theme, hero) {
+    const match = theme.match || {};
+    if (match.tierId && match.tierId !== hero.tierId) return false;
+    if (match.roleId && (hero.roleIds || []).indexOf(match.roleId) === -1) return false;
+    if (match.allegianceId && match.allegianceId !== hero.allegianceId) return false;
+    return true;
+  }
+
+  // Pass no hero to get the default theme.
+  function themeFor(hero) {
+    let best = setup.themes.find(function (theme) { return !themeConditionCount(theme); }) || setup.themes[0];
+    if (!hero) return best;
+    let bestScore = 0;
+    setup.themes.forEach(function (theme) {
+      const score = themeConditionCount(theme);
+      if (score > bestScore && themeMatches(theme, hero)) {
+        best = theme;
+        bestScore = score;
+      }
+    });
+    return best;
+  }
+
+  // Glow is derived from the accent so designers only pick two colours.
+  function glowFor(hex) {
+    const clean = String(hex || "").replace("#", "");
+    const full = clean.length === 3 ? clean.split("").map(function (c) { return c + c; }).join("") : clean;
+    const num = parseInt(full, 16);
+    if (full.length !== 6 || isNaN(num)) return "rgba(240, 198, 122, 0.45)";
+    return "rgba(" + (num >> 16 & 255) + ", " + (num >> 8 & 255) + ", " + (num & 255) + ", 0.45)";
   }
 
   function escapeHtml(value) {
@@ -109,34 +220,22 @@
     return { origin: origin, squares: squares };
   }
 
+  // Heroes store [{ id, value }]; names and descriptions come from the setup.
   function defaultStats(values) {
     const map = values || {};
-    return STAT_DEFS.map(function (def) {
-      const fallback = def.id === "CRIT" ? "0%" : "0";
-      return {
-        id: def.id,
-        code: def.code,
-        name: def.name,
-        description: def.description,
-        value: map[def.id] != null ? String(map[def.id]) : fallback
-      };
+    return statDefs().map(function (def) {
+      return { id: def.id, value: map[def.id] != null ? String(map[def.id]) : def.defaultValue };
     });
   }
 
-  function defaultMovement(size) {
-    const board = size || 7;
-    const pattern = queenPattern(board);
+  // Fields older saves kept on each hero. The first five were never design rules; the
+  // board fields now live once in the setup. All are stripped on load.
+  const RETIRED_MOVEMENT_FIELDS = ["minDistance", "maxDistance", "canJump", "blockedByFriendly", "blockedByEnemy",
+    "label", "note", "size", "origin"];
+
+  function defaultMovement() {
     return {
-      label: "Movement",
-      note: "Squares marked + can be reached in one turn.",
-      size: board,
-      origin: pattern.origin,
       squares: [],
-      minDistance: 0,
-      maxDistance: null,
-      canJump: false,
-      blockedByFriendly: true,
-      blockedByEnemy: true,
       intermediateMustBeEmpty: true,
       directions: ["orthogonal", "diagonal"],
       conditions: []
@@ -184,12 +283,12 @@
       contentStatus: "",
       productionStateId: "state-concept",
       tierId: "tier-1",
+      allegianceId: "",
       roleIds: [],
       tagIds: [],
       artwork: { kind: "path", value: "" },
-      theme: clone(DEFAULT_THEME),
       stats: defaultStats(),
-      movement: defaultMovement(7),
+      movement: defaultMovement(),
       abilities: [],
       lore: [],
       related: [],
@@ -261,34 +360,23 @@
   function normalizeHero(raw) {
     const base = emptyHero();
     if (!raw) return base;
-    const stats = Array.isArray(raw.stats) && raw.stats.length
-      ? (Array.isArray(raw.stats[0])
-        ? raw.stats.reduce(function (acc, row) { return acc.concat(row); }, [])
-        : raw.stats).map(function (stat) {
-          const def = STAT_DEFS.find(function (item) { return item.id === stat.id || item.code === stat.code; }) || {};
-          return {
-            id: stat.id || def.id || stat.code,
-            code: stat.code || def.code || stat.id,
-            name: stat.name || def.name || stat.code,
-            description: stat.description || def.description || "",
-            value: stat.value != null ? String(stat.value) : "0"
-          };
-        })
-      : defaultStats();
-    STAT_DEFS.forEach(function (def) {
-      if (!stats.some(function (stat) { return stat.id === def.id; })) {
-        stats.push({ id: def.id, code: def.code, name: def.name, description: def.description, value: def.id === "CRIT" ? "0%" : "0" });
-      }
+    // Older saves nested stats in pairs and keyed them by "code" (same text as the id).
+    const rawStats = Array.isArray(raw.stats)
+      ? (Array.isArray(raw.stats[0]) ? raw.stats.reduce(function (acc, row) { return acc.concat(row); }, []) : raw.stats)
+      : [];
+    const values = {};
+    rawStats.forEach(function (stat) {
+      const id = stat && (stat.id || stat.code);
+      if (id) values[id] = stat.value != null ? String(stat.value) : "0";
     });
-    const ordered = STAT_DEFS.map(function (def) {
-      return stats.find(function (stat) { return stat.id === def.id; });
-    }).filter(Boolean);
+    // Setup order first; values for stats since removed from the setup are kept, not shown.
+    const ordered = defaultStats(values);
+    Object.keys(values).forEach(function (id) {
+      if (!ordered.some(function (stat) { return stat.id === id; })) ordered.push({ id: id, value: values[id] });
+    });
 
-    const movement = Object.assign(defaultMovement((raw.movement && raw.movement.size) || 7), raw.movement || {});
-    if (!movement.origin) {
-      const pattern = queenPattern(movement.size);
-      movement.origin = pattern.origin;
-    }
+    const movement = Object.assign(defaultMovement(), raw.movement || {});
+    RETIRED_MOVEMENT_FIELDS.forEach(function (field) { delete movement[field]; });
     movement.squares = Array.isArray(movement.squares) ? movement.squares.map(function (sq) {
       return { row: Number(sq.row), col: Number(sq.col) };
     }) : [];
@@ -310,6 +398,7 @@
       contentStatus: raw.contentStatus || "",
       productionStateId: raw.productionStateId || "state-concept",
       tierId: raw.tierId || (raw.tier ? "tier-" + raw.tier : "tier-1"),
+      allegianceId: raw.allegianceId || "",
       roleIds: roleIds,
       tagIds: tagIds,
       artwork: raw.artwork && raw.artwork.kind === "pending"
@@ -317,7 +406,6 @@
         : (raw.artwork
           ? (raw.artwork.kind ? clone(raw.artwork) : { kind: "path", value: raw.artwork.src || raw.artwork.value || "" })
           : { kind: "path", value: "" }),
-      theme: Object.assign(clone(DEFAULT_THEME), raw.theme || {}),
       stats: ordered,
       movement: movement,
       abilities: Array.isArray(raw.abilities) ? raw.abilities.map(normalizeAbility) : [],
@@ -365,7 +453,7 @@
     if (existingIds && existingIds.indexOf(hero.id) !== -1) errors.push("A hero with this id already exists.");
     hero.stats.forEach(function (stat) {
       if (parseStatNumber(stat.value) == null) {
-        errors.push(stat.code + " must include a numeric value.");
+        errors.push(statName(stat.id) + " must include a numeric value.");
       }
     });
     return errors;
@@ -389,12 +477,22 @@
   }
 
   Codex.schema = {
-    STAT_DEFS: STAT_DEFS,
-    DEFAULT_THEME: DEFAULT_THEME,
+    DEFAULT_SETUP: DEFAULT_SETUP,
+    THEME_MATCH_KEYS: THEME_MATCH_KEYS,
+    normalizeSetup: normalizeSetup,
+    applySetup: applySetup,
+    getSetup: getSetup,
+    statDefs: statDefs,
+    statName: statName,
+    board: board,
+    themeFor: themeFor,
+    glowFor: glowFor,
+    clampBoardSize: clampBoardSize,
     ABILITY_ICONS: ABILITY_ICONS,
     DEFAULT_TAXONOMY: DEFAULT_TAXONOMY,
     uid: uid,
     slugify: slugify,
+    labelCase: labelCase,
     clone: clone,
     escapeHtml: escapeHtml,
     parseStatNumber: parseStatNumber,
