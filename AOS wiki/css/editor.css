@@ -655,10 +655,13 @@ textarea { width: 100%; min-height: 120px; }
 .setup-actions.is-dirty .dirty-note { color: var(--ember); }
 
 @media (max-width: 980px) {
+  /* Heading and its button fit on one row; the generic narrow-screen column layout pushed the heading right. */
+  .section-head.tight { flex-direction: row; align-items: center; }
   .setup-board { grid-template-columns: 1fr; }
-  .setup-stat-row { grid-template-columns: 70px 1fr; }
+  /* Narrow: id + name, then description full width, then new-hero value + buttons. */
+  .setup-stat-row { grid-template-columns: 90px 1fr; }
+  .setup-stat-row > :nth-child(3) { grid-column: 1 / -1; }
   .setup-stat-head { display: none; }
-  .row-actions { grid-column: 1 / -1; }
 }
 
 @media (max-width: 980px) {

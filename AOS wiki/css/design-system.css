@@ -128,8 +128,38 @@ h1, h2, h3, .display {
       rgba(240, 198, 122, 0.0) 4%,
       rgba(240, 198, 122, 0.55) 50%,
       rgba(240, 198, 122, 0.0) 96%,
-      transparent 100%) left top / 100% 1px no-repeat,
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 10' preserveAspectRatio='xMidYMid meet'%3E%3Cpath d='M0 5h58M102 5h58' stroke='%23f0c67a' stroke-opacity='.55' stroke-width='.6'/%3E%3Cpath d='M58 5c6-6 12-6 18 0s12 6 18 0M68 5c3-2 7-2 10 0' fill='none' stroke='%23f0c67a' stroke-opacity='.85' stroke-width='.7'/%3E%3Ccircle cx='80' cy='5' r='1.2' fill='%23f0c67a'/%3E%3C/svg%3E") center 1px / 160px 10px no-repeat;
+      transparent 100%) left top / 100% 1px no-repeat;
+}
+/* Divider ornament centred on the menu's bottom rule. */
+.nav::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -13px;
+  width: 72px;
+  height: 26px;
+  transform: translateX(-50%);
+  pointer-events: none;
+  background: var(--accent);
+  -webkit-mask: var(--orn-divider) center / contain no-repeat;
+  mask: var(--orn-divider) center / contain no-repeat;
+}
+/* A mirrored pair of leaves frames the menu links. */
+.nav-links::before,
+.nav-links::after {
+  content: "";
+  flex: none;
+  width: 28px;
+  height: 14px;
+  opacity: 0.7;
+  background: var(--accent);
+  -webkit-mask: var(--orn-leaf) center / contain no-repeat;
+  mask: var(--orn-leaf) center / contain no-repeat;
+}
+.nav-links::before { transform: scaleX(-1); }
+/* Below this the menu needs the room; the leaves would push it onto two rows. */
+@media (max-width: 1099px) {
+  .nav-links::before, .nav-links::after { display: none; }
 }
 /* Studio mark links back to the Pine Fig site; the title beside it is the codex home. */
 .studio-link {
@@ -267,13 +297,20 @@ main { position: relative; z-index: 1; }
   font-size: 20px;
   letter-spacing: 0.04em;
 }
+/* ---------- ornaments ----------
+   Cut from images/pattern.jpg into white-on-transparent PNGs (images/ornaments/),
+   embedded as --orn-* variables in css/ornaments.css. Used as masks so they take the hero's theme accent colour. The source is 612px,
+   so keep each one small (about 150px wide at most) or it turns soft. */
+.loading-mark,
+#view.is-loading::after { --ornament: var(--orn-rosette); }
+
 .loading-mark {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  border: 2px solid var(--line);
-  border-top-color: var(--gold);
-  animation: codex-spin 0.9s linear infinite;
+  width: 56px;
+  height: 56px;
+  background: var(--accent);
+  -webkit-mask: var(--ornament) center / contain no-repeat;
+  mask: var(--ornament) center / contain no-repeat;
+  animation: codex-spin 6s linear infinite;
 }
 /* A page that takes a moment to swap in dims the old one and shows the same mark. */
 #view.is-loading > * { opacity: 0.35; transition: opacity 0.2s ease; pointer-events: none; }
@@ -282,17 +319,116 @@ main { position: relative; z-index: 1; }
   position: fixed;
   left: 50%;
   top: 50%;
-  width: 44px;
-  height: 44px;
-  margin: -22px 0 0 -22px;
-  border-radius: 50%;
-  border: 2px solid var(--line);
-  border-top-color: var(--gold);
-  animation: codex-spin 0.9s linear infinite;
+  width: 56px;
+  height: 56px;
+  margin: -28px 0 0 -28px;
+  background: var(--accent);
+  -webkit-mask: var(--ornament) center / contain no-repeat;
+  mask: var(--ornament) center / contain no-repeat;
+  animation: codex-spin 6s linear infinite;
 }
 @keyframes codex-spin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) {
-  .loading-mark, #view.is-loading::after { animation-duration: 2.4s; }
+  .loading-mark, #view.is-loading::after { animation: none; }
+}
+
+/* Page edges: swirls in the bottom corners and vines halfway down each side.
+   Fixed to the window and drawn behind the content (main is z-index 1). */
+.edge-ornaments {
+  position: fixed;
+  inset: 12px;
+  z-index: 0;
+  pointer-events: none;
+}
+.edge-ornaments span {
+  position: absolute;
+  opacity: 0.32;
+  background: var(--accent);
+}
+.edge-corner {
+  bottom: 10px;
+  width: 170px;
+  height: 94px;
+  -webkit-mask: var(--orn-corner-swirl) left bottom / contain no-repeat;
+  mask: var(--orn-corner-swirl) left bottom / contain no-repeat;
+}
+.edge-bl { left: 10px; }
+.edge-br { right: 10px; transform: scaleX(-1); }
+.edge-vine {
+  top: 50%;
+  width: 30px;
+  height: 120px;
+  margin-top: -60px;
+}
+.edge-l {
+  left: 2px;
+  -webkit-mask: var(--orn-vine-left) center / contain no-repeat;
+  mask: var(--orn-vine-left) center / contain no-repeat;
+}
+.edge-r {
+  right: 2px;
+  -webkit-mask: var(--orn-vine-right) center / contain no-repeat;
+  mask: var(--orn-vine-right) center / contain no-repeat;
+}
+/* Vines need a real side margin (content is max 1180px wide); corners shrink, then go below 1024px. */
+@media (max-width: 1279px) {
+  .edge-vine { display: none; }
+  .edge-corner { width: 110px; height: 61px; opacity: 0.22; }
+}
+@media (max-width: 1023px) {
+  .edge-ornaments { display: none; }
+}
+
+/* Sweep under the page title. */
+.page-block h1::after {
+  content: "";
+  display: block;
+  width: 116px;
+  height: 58px;
+  margin-top: 8px;
+  opacity: 0.75;
+  background: var(--accent);
+  -webkit-mask: var(--orn-sweep) left center / contain no-repeat;
+  mask: var(--orn-sweep) left center / contain no-repeat;
+}
+
+/* One ornament in the top-right corner of each panel. Every panel uses a
+   different piece so no ornament repeats (hero page: Lore, Draft history;
+   Setup page: board, stats, themes). */
+.panel, .setup-block { position: relative; }
+.panel::before,
+.setup-block::before {
+  content: "";
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  width: 84px;
+  height: 60px;
+  opacity: 0.28;
+  pointer-events: none;
+  background: var(--accent);
+  -webkit-mask: var(--panel-ornament) right top / contain no-repeat;
+  mask: var(--panel-ornament) right top / contain no-repeat;
+}
+/* Setup sections keep their Add button top-right, so their ornament sits bottom-right. */
+.setup-block::before { top: auto; bottom: 14px; }
+#lore { --panel-ornament: var(--orn-plume); }
+#stats { --panel-ornament: var(--orn-flourish); }
+.setup-board-block { --panel-ornament: var(--orn-feather); }
+.setup-stats-block { --panel-ornament: var(--orn-sprig); }
+.setup-themes-block { --panel-ornament: var(--orn-swirl); }
+
+/* Pendant above empty and error messages. */
+.empty-state::before {
+  content: "";
+  display: block;
+  width: 44px;
+  height: 46px;
+  margin: 0 auto 14px;
+  opacity: 0.7;
+  background: var(--accent);
+  -webkit-mask: var(--orn-pendant) center / contain no-repeat;
+  mask: var(--orn-pendant) center / contain no-repeat;
 }
 
 .kicker {
@@ -906,6 +1042,22 @@ footer.site {
   flex-wrap: wrap;
   color: var(--cream-faint);
   font-size: 13px;
+}
+/* Shell ornament sitting on the footer rule. */
+footer.site { margin-top: 40px; }
+footer.site::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: -34px;
+  width: 120px;
+  height: 55px;
+  transform: translateX(-50%);
+  opacity: 0.6;
+  pointer-events: none;
+  background: var(--accent);
+  -webkit-mask: var(--orn-shell) center bottom / contain no-repeat;
+  mask: var(--orn-shell) center bottom / contain no-repeat;
 }
 footer.site a { color: var(--cream-dim); text-underline-offset: 3px; }
 footer.site a:hover { color: var(--gold); }

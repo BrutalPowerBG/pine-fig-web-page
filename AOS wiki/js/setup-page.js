@@ -26,7 +26,7 @@
       }
     }
     return (
-      '<section class="setup-block">' +
+      '<section class="setup-block setup-board-block">' +
         '<div class="section-head tight"><h2>Movement board</h2></div>' +
         '<p class="hint">Shared by every hero. Heroes only store which squares they can reach. Click a square to set where the hero stands.</p>' +
         '<div class="setup-board">' +
@@ -61,7 +61,7 @@
       );
     }).join("");
     return (
-      '<section class="setup-block">' +
+      '<section class="setup-block setup-stats-block">' +
         '<div class="section-head tight"><h2>Stats</h2><button type="button" class="btn" data-stat-add>Add stat</button></div>' +
         '<p class="hint">The id is what heroes store, so it cannot change once saved. Rename freely; every hero updates.</p>' +
         '<div class="setup-stat-row setup-stat-head" aria-hidden="true"><span>Id</span><span>Name</span><span>Description</span><span>New hero value</span><span></span></div>' +
@@ -93,7 +93,7 @@
 
   function themesHtml() {
     return (
-      '<section class="setup-block">' +
+      '<section class="setup-block setup-themes-block">' +
         '<div class="section-head tight"><h2>Colour themes</h2><button type="button" class="btn" data-theme-add>Add theme</button></div>' +
         '<p class="hint">A hero page uses the theme whose conditions all match it. When several match, the one with more conditions wins; on a tie, the higher one in this list. Add allegiances on the <a class="text-link" href="#/taxonomy">Tags</a> page.</p>' +
         '<div class="setup-themes">' + page.draft.themes.map(themeHtml).join("") + "</div>" +
